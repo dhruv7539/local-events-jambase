@@ -35,12 +35,25 @@ are the safer default. That tradeoff is noted in `requirements.txt` itself.
 ## Backend / API design
 
 **The Protocol boundary is the load-bearing decision.** `EventProvider` declares
-`fetch_events(location, days) -> list[Event]` and the error types it may raise.
+`fetch_events(location, days) -> SearchResult` and the error types it may raise.
 Routes depend on that Protocol via `Depends`; `app/routes.py` never imports
 `JamBaseProvider`. The concrete class is named in exactly one place —
 `app/main.py`, inside the lifespan — so swapping the upstream source is a
 one-line change. `JamBaseProvider` satisfies the Protocol *structurally* and
 does not inherit from it, which keeps it a contract rather than a base class.
+
+**Results are an envelope, not a bare list.** `fetch_events` returns a
+`SearchResult` carrying `events`, `total_available`, `returned_count` and
+`resolved_location`. This started as a bare `list[Event]` and was changed after
+looking at real output: JamBase reports 262 matching events for a 30-day Dallas
+search and we return one page of 100, so a list alone presented a truncated
+slice as though it were the whole answer. `returned_count` is derived from
+`len(events)` rather than stored, so the two cannot disagree. `total_available`
+is `None` when the provider reported no trustworthy total — including when it
+reports a total *smaller* than the page it just sent, which is discarded rather
+than passed through. The UI says "Showing the first 100 of 262" when truncated,
+a plain count when complete, and states explicitly that the total is unknown
+when it is. Upstream `pagination` never leaves the adapter.
 
 **`Event` is our model, not JamBase's.** This is the difference between an
 adapter and a passthrough, and the JamBase response makes the case concretely.
@@ -90,11 +103,25 @@ is a test asserting exactly that. Verified live: with the upstream blackholed,
 `/events` returns a clean 504 and no stack trace, while `/health` still returns
 200.
 
-**On rate limiting: the code does none, and that is a real gap.** JamBase
-returns no `X-RateLimit-*` headers on any response I inspected, so there is no
-documented budget to back off against and I chose not to invent one. The cache
-is the only quota defence in this implementation. Given a documented budget I'd
-add a token bucket in front of the provider and honour `Retry-After` on 429s.
+**Cache, retry and rate limiting are three different things, and only two are
+implemented.** The **cache** avoids unnecessary upstream requests. The **retry**
+handles transient failures: exactly one extra attempt on 429/502/503/504 and on
+connection-level errors, after a 250ms delay. Neither is a **rate limiter** —
+there is no token bucket and no client-side quota throttling in this code at all.
+JamBase returns no `X-RateLimit-*` headers on any response I inspected, so there
+is no documented budget to throttle against and I did not invent one; given a
+documented budget I would add a token bucket in front of the provider.
+
+The retry is bounded at one attempt on purpose. This is interactive
+request/response traffic, so every additional attempt spends the user's latency
+and our provider quota to buy a shrinking increment of recovery probability.
+Two deliberate exclusions: deterministic 4xx responses (400/401/403/404) are
+never retried because the answer will not change, and read/write timeouts are
+not retried either — unlike a refused connection, a read timeout means the
+request already consumed its entire budget, so a second attempt would double an
+interactive user's wait on an upstream already known to be slow. A `Retry-After`
+is honoured only when it is a small number of seconds; a long or unparseable
+value fails cleanly rather than stalling the request.
 
 ## UI design decisions
 
@@ -136,20 +163,20 @@ provider-supplied strings are inserted with `textContent`, never `innerHTML`.
 
 ## Tradeoffs made to keep it simple
 
-- **One page of results.** A single upstream page of up to 60 events, no
-  pagination. Austin over 30 days returns 268 events; this app shows the first
-  60 with no indication that more exist. That is the most user-visible shortcut
-  in the build.
+- **One page of results.** A single upstream page of up to 100 events — the
+  maximum the JamBase spec documents for `perPage` — and no pagination. Dallas
+  over 30 days has 262 matching events; this app returns 100. It now *says* so,
+  in both the API response and the UI, which converts a silent correctness bug
+  into a disclosed limitation. It does not make the result complete.
 - **In-memory cache, single process.** No Redis. The cache is per-process, so it
   is cold on every deploy and useless behind more than one worker.
 - **No background expiry.** Entries are evicted on read. A key never queried
   again holds its memory until the process exits.
 - **No auth, no rate limiting on our own endpoint.** Anyone who can reach this
   service can spend our upstream quota.
-- **Tests cover the adapter, not the HTTP layer.** 24 tests hit normalisation,
-  city selection, failure translation and caching. There are no tests that go
-  through FastAPI's router, so route wiring and the exception handler are
-  verified by hand (I ran them) rather than by CI.
+- **No linter or type-checker.** 72 tests cover normalisation, city selection,
+  failure translation, retry policy, caching and the HTTP routes, but nothing
+  enforces style or checks the type annotations that the design leans on.
 - **The UI was verified late, and looking at it found three defects.** I built
   the whole UI from `curl` output before ever seeing it render. When I finally
   screenshotted it (headless Chrome, light and dark), three problems were
@@ -172,17 +199,19 @@ provider-supplied strings are inserted with `textContent`, never `innerHTML`.
 
 ## What I'd change or add with more time
 
-1. **Pagination**, or at minimum a "showing 60 of 268" line so the limit is
-   honest.
-2. **Route-level tests** using `TestClient` with a stub provider injected through
-   the `Depends` override — cheap, and it would cover the exception handler.
-3. **A stale-while-revalidate cache**: serve slightly stale results when the
+1. **Actual pagination.** The truncation is now *disclosed* ("showing the first
+   100 of 262"), which is the correctness fix, but the missing events are still
+   missing. Following `pagination.nextPage` with a page cap is the next step,
+   and the reason it wasn't done is quota, not difficulty: five pages per search
+   is five times the upstream spend on a trial key.
+2. **A stale-while-revalidate cache**: serve slightly stale results when the
    upstream is down instead of returning 504 on a cache miss during an outage.
-4. **Retries with jittered backoff** on connect errors and 5xx, which are worth
-   one retry, unlike timeouts.
-5. **Structured logging** with a request ID threaded through to the provider
+3. **Jittered backoff**, if a second retry were ever justified — the current
+   policy is a single fixed 250ms delay, which is fine for one attempt but would
+   synchronise clients if it ever became a loop.
+4. **Structured logging** with a request ID threaded through to the provider
    call, so an upstream failure can be traced to a specific user request.
-6. **Filters that matter**: date range beyond the presets, and genre — the data
+5. **Filters that matter**: date range beyond the presets, and genre — the data
    is already normalised for both.
 
 ## How I used AI
@@ -202,9 +231,14 @@ It also wrote most of the boilerplate — models, cache, error hierarchy, tests 
 faster than I would have.
 
 Where I had to steer it was **scope and product judgment**. Left alone it
-proposed a second location input mode (lat/lng radius) and a richer return type
-than the specified `list[Event]`; both were cut for contradicting the brief. The
-substantive disagreement is below.
+proposed a second location input mode (lat/lng radius), which was cut as scope
+creep, and a richer return type than the `list[Event]` I had specified, which I
+also cut at the time — correctly, because the argument for it was aesthetic and
+I had been explicit about the contract. What makes that one worth recording is
+what happened next: after seeing real output showing 60 events returned against
+268 available, I reversed my own constraint and adopted the envelope. The right
+call twice, on different evidence — rejecting it as unjustified architecture,
+then adopting it once there was a concrete correctness failure to point at.
 
 I kept `AI_LOG.md` during the build recording each override, flag and judgment
 call as it happened rather than reconstructing it afterwards.
@@ -239,56 +273,61 @@ and a wrong reason survives into the next decision.
 
 ## The biggest technical limitation
 
-**The results ceiling.** The app fetches one upstream page of at most 60 events
-and presents it as though it were the answer. Austin over a 30-day window has
-268. A user searching a busy city over a month sees roughly a fifth of what
-exists, sorted by date, with nothing in the UI indicating that anything was
-omitted. Worse, the truncation is silent and date-ordered, so the missing events
-are systematically the later ones — a user searching 30 days out may see nothing
-past week two and reasonably conclude the city is empty then.
+**The results ceiling.** The app fetches one upstream page — now 100 events, the
+maximum `perPage` the JamBase spec documents — and a 30-day Dallas search has
+262 matching events. A user searching a busy city over a month sees under half
+of what exists, and because results are date-ordered, the missing ones are
+systematically the later ones.
 
-This is not theoretical. Rendering a 30-day Austin search produced exactly 60
-cards, and neither the rescheduled show on 1 September nor the festival on
-5 September was among them — both exist in the data and both were silently
-dropped. The app's headline feature is surfacing status changes, and the
-truncation demonstrably hides them.
+This is not theoretical. Before the page size was raised, rendering a 30-day
+Austin search produced exactly 60 cards, and neither the rescheduled show on
+1 September nor the festival on 5 September was among them — both existed in the
+data and both were silently dropped. The app's headline feature is surfacing
+status changes, and the truncation was hiding them.
 
-Fetching more pages is a loop over `pagination.nextPage`, but it is not free: on
-a trial key, following five pages multiplies quota use per search by five. The
-cheaper honest fix — telling the user "showing 60 of 268" — is blocked by
-something more interesting. `fetch_events(location, days) -> list[Event]` has no
-envelope, so there is nowhere for result *metadata* to live: not the total
-available, not which page we stopped at. Surfacing the ceiling honestly requires
-returning a `SearchResult` wrapper rather than a bare list.
-
-That is worth noticing because it is the same change the ten-provider design
-needs for partial failure, below. A bare `list[Event]` says "here is the
-complete answer" and cannot say "here is part of the answer, and here is what is
-missing" — which is the thing a real aggregator most needs to say.
+What changed during this pass is honesty, not completeness. `SearchResult` now
+reports `total_available` alongside `returned_count`, and the UI says "Showing
+the first 100 of 262" instead of implying it has everything. That converts a
+silent correctness bug into a stated limitation — a real improvement, and not
+the same thing as fixing it. **The missing events are still missing.** Following
+`pagination.nextPage` is a small loop; it was left out because on a trial key
+each additional page multiplies quota spend per search, which is a cost decision
+rather than an engineering one.
 
 Second place, and closer than I'd like: the in-memory cache means the quota
-protection this app relies on disappears the moment it runs more than one worker.
+protection this app relies on disappears the moment it runs more than one
+worker.
 
 ## Evolving to 10 providers
 
 The Protocol boundary is the part that already works, and I'd expect it to hold.
-`fetch_events(location, days) -> list[Event]` is a shape any ticketing API can
-satisfy, and the tests already substitute a fake transport, so a second
-implementation needs no changes to routes, models, or UI. What follows are the
-things that would *actually* break at ten:
+`fetch_events(location, days) -> SearchResult` is a shape any ticketing API can
+satisfy, and this is now demonstrated rather than asserted: the HTTP tests drive
+the real FastAPI routes with a `FakeEventProvider` that shares no code with
+`JamBaseProvider`, injected through `dependency_overrides`. If the boundary
+leaked a JamBase detail, those tests could not pass. What follows are the things
+that would *actually* break at ten:
 
 **1. Fan-out and merge.** A `CompositeProvider` that itself satisfies
 `EventProvider`, wrapping the ten and calling them with `asyncio.gather`. Routes
 would not know the difference. Total latency becomes the slowest provider, so it
 needs a per-provider timeout budget shorter than the overall one.
 
-**2. Partial failure becomes the normal case** — and it needs the same
-`SearchResult` envelope the results ceiling already asked for. With ten upstreams, one being
-down is routine, and the current all-or-nothing error model is wrong: today any
-`ProviderError` fails the request. The response would need to carry which sources
-answered, and the composite would return partial results with a `degraded` flag
-rather than a 502. This is the single biggest change, and it is a change to the
-*response contract*, not just the plumbing.
+**2. Partial failure becomes the normal case.** With ten upstreams, one being
+down is routine, and the current error model is all-or-nothing: today any
+`ProviderError` fails the whole request. A composite would need to return partial
+results — which sources answered, which failed, and a degraded flag — rather
+than a 502.
+
+`SearchResult` is the right *shape* for that and is why the change is now
+plumbing rather than a contract break: a bare list can only say "here is the
+answer", whereas an envelope has room for completeness metadata to grow into. To
+be precise about what exists today, though: `SearchResult` currently carries
+`total_available`, `returned_count` and `resolved_location` for a **single**
+provider. It implements no multi-provider partial-failure handling, no
+per-provider status, and no warnings collection. Those are fields and logic that
+would need to be added; the envelope just means adding them wouldn't force every
+caller to change.
 
 **3. Deduplication, which is the genuinely hard part.** Ten providers will list
 the same concert. There is no shared ID, so matching means fuzzy-matching on
@@ -315,10 +354,11 @@ and where the "no database" call would be revisited.
 
 | Area | Grade | Reasoning |
 |---|---|---|
-| **Code quality** | **B+** | Clean layering, honest naming, meaningful docstrings, and 24 tests against real captured data — but no linter or type-checker is configured or run, and the HTTP layer has no automated coverage at all. |
-| **Work product** | **B** | Every requirement is verified live, including all failure paths, and screenshotting the UI caught four real rendering defects that are now fixed — but I built it blind for far too long, and the 60-event ceiling demonstrably hides the rescheduled and cancelled shows the app exists to surface. |
-| **Extensibility** | **B+** | The Protocol boundary is real and proven by test doubles rather than asserted — but it has exactly one implementation, so the abstraction is untested against a second API's shape, which is the only test that counts. |
+| **Code quality** | **B+** | Clean layering, honest naming, and 72 tests covering normalisation, retry policy, cache expiry and the HTTP routes, built on real captured data — but no linter, type-checker or CI is configured, so the type annotations the design leans on are never actually verified. |
+| **Work product** | **B+** | Every requirement is verified live, including all failure paths; opening the UI caught five real rendering defects, now fixed; and the truncation is disclosed rather than silent. Still short of the mark: I built the UI blind for far too long, and a busy 30-day search returns 100 of 262 events — disclosed, but still incomplete. |
+| **Extensibility** | **A−** | The boundary is proven, not asserted: the real routes run against a non-JamBase provider, and the result envelope leaves room for completeness and per-provider metadata to grow into. Short of an A because it still has exactly one real implementation — the abstraction has never met a second API's shape, which is the only test that truly counts. |
 
-Not straight A's, and it shouldn't be: this is a two-hour build with a results
-ceiling that hides the app's own headline signal, a UI I didn't look at until
-after it was written, and an abstraction that hasn't yet met its second case.
+Not straight A's, and it shouldn't be: this is a timeboxed build with a results
+ceiling it discloses but does not fix, no linting or type-checking, a UI I
+didn't look at until after it was written, and an abstraction that hasn't yet
+met its second case.

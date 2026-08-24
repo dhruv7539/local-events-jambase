@@ -137,8 +137,15 @@ any external client would.
 pytest
 ```
 
-24 tests, no network — the transport is stubbed with `httpx.MockTransport`, and
-the fixture is a real captured JamBase response.
+72 tests, no network and no API key required.
+
+- `tests/test_normalize.py` — the adapter: normalisation, city resolution,
+  retry policy, failure translation and cache TTL behaviour. The transport is
+  stubbed with `httpx.MockTransport` and the fixture is a real captured JamBase
+  response; TTL expiry uses an injected fake clock rather than sleeping.
+- `tests/test_routes.py` — the HTTP layer, driven with a `FakeEventProvider`
+  injected via `dependency_overrides`, proving the routes work against a
+  provider that is not `JamBaseProvider`.
 
 ## Interactive API docs
 
