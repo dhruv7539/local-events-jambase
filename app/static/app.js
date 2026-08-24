@@ -111,6 +111,13 @@ function titleMentions(title, name) {
   return flatten(title).includes(flatten(name));
 }
 
+// Format from the browser's declared language, not the OS regional format.
+// Passing `undefined` uses the system locale, which can disagree: on a Mac
+// reporting navigator.language "en-US" but a UK regional format, every price
+// rendered "US$15" and every showtime "19:00". Found by opening the page in a
+// real browser — headless Chrome hid it behind its own default locale.
+const LOCALE = navigator.language || "en-US";
+
 function priceEl(range) {
   // Absent pricing is stated plainly. JamBase publishes a price on only a
   // minority of ticket offers, and showing $0 or a guess would be worse than
@@ -126,7 +133,7 @@ function priceEl(range) {
 
 function money(amount, currency) {
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(LOCALE, {
       style: "currency",
       currency,
       maximumFractionDigits: 0,
@@ -141,7 +148,7 @@ function formatWhen(event) {
   if (!event.event_time) return `${when} · time TBA`;
   const [h, m] = event.event_time.split(":");
   const d = new Date(2000, 0, 1, Number(h), Number(m));
-  const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const time = d.toLocaleTimeString(LOCALE, { hour: "numeric", minute: "2-digit" });
   return `${when} · ${time}`;
 }
 
@@ -149,7 +156,7 @@ function formatDate(iso) {
   // Parsed as parts, not via Date(iso), which would treat a bare date as UTC
   // and can render the previous day west of Greenwich.
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+  return new Date(y, m - 1, d).toLocaleDateString(LOCALE, {
     weekday: "short",
     month: "short",
     day: "numeric",
