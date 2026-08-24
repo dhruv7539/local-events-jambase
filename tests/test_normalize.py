@@ -456,3 +456,130 @@ def test_short_retry_after_is_honoured():
 
 def test_absent_retry_after_uses_our_own_short_delay():
     assert JamBaseProvider._retry_delay(httpx.Response(503)) == RETRY_DELAY_SECONDS
+
+
+# --------------------------------------------------------------------- cache
+
+
+class FakeClock:
+    """Deterministic monotonic clock, so TTL expiry is tested without sleeping."""
+
+    def __init__(self) -> None:
+        self.now = 1000.0
+
+    def __call__(self) -> float:
+        return self.now
+
+    def advance(self, seconds: float) -> None:
+        self.now += seconds
+
+
+@pytest.fixture
+def clock(monkeypatch):
+    fake = FakeClock()
+    monkeypatch.setattr("app.cache.time.monotonic", fake)
+    return fake
+
+
+def tracking_handler():
+    """Handler that records every upstream path it is asked for."""
+    calls: list[str] = []
+
+    def handler(request):
+        calls.append(request.url.path)
+        return happy_handler(request)
+
+    return handler, calls
+
+
+def counts(calls: list[str]) -> tuple[int, int]:
+    """(city-resolution calls, event calls)"""
+    return (
+        len([c for c in calls if "geographies" in c]),
+        len([c for c in calls if c.endswith("/events")]),
+    )
+
+
+@pytest.mark.asyncio
+async def test_identical_query_reuses_the_cached_result(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    await provider.fetch_events("Austin, TX", 7)
+    assert counts(calls) == (1, 1)
+
+
+@pytest.mark.asyncio
+async def test_different_location_is_a_separate_cache_entry(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    await provider.fetch_events("Austintown, OH", 7)
+    cities, events = counts(calls)
+    assert cities == 2 and events == 2
+
+
+@pytest.mark.asyncio
+async def test_different_days_is_a_separate_cache_entry(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    await provider.fetch_events("Austin, TX", 30)
+    cities, events = counts(calls)
+    assert events == 2, "a different window must not reuse the cached page"
+    assert cities == 1, "city resolution should still be cached"
+
+
+@pytest.mark.asyncio
+async def test_expired_event_entry_triggers_a_fresh_request(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    clock.advance(301)  # event TTL is 300s
+    await provider.fetch_events("Austin, TX", 7)
+    assert counts(calls)[1] == 2
+
+
+@pytest.mark.asyncio
+async def test_event_entry_still_valid_just_before_expiry(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    clock.advance(299)
+    await provider.fetch_events("Austin, TX", 7)
+    assert counts(calls)[1] == 1
+
+
+@pytest.mark.asyncio
+async def test_longer_city_ttl_avoids_repeating_location_resolution(clock):
+    """The point of the two-TTL design: stale events are refetched, but the
+    city lookup that resolved them is not repeated."""
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+
+    clock.advance(3600)  # past the 300s event TTL, well inside the 24h city TTL
+    await provider.fetch_events("Austin, TX", 7)
+
+    cities, events = counts(calls)
+    assert events == 2, "expired events should be refetched"
+    assert cities == 1, "city resolution should NOT be repeated"
+
+
+@pytest.mark.asyncio
+async def test_city_entry_does_eventually_expire(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    clock.advance(86_401)  # past the 24h city TTL
+    await provider.fetch_events("Austin, TX", 7)
+    assert counts(calls)[0] == 2
+
+
+@pytest.mark.asyncio
+async def test_cache_key_is_case_insensitive_for_location(clock):
+    handler, calls = tracking_handler()
+    provider = make_provider(handler)
+    await provider.fetch_events("Austin, TX", 7)
+    await provider.fetch_events("austin, tx", 7)
+    assert counts(calls)[0] == 1, "location casing should not split the city cache"
