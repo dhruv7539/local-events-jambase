@@ -57,8 +57,10 @@ curl "http://127.0.0.1:8000/events?location=Austin,%20TX&days=7"
 ```json
 {
   "location": "Austin, TX",
+  "resolved_location": "Austin, TX",
   "days": 7,
-  "count": 57,
+  "total_available": 260,
+  "returned_count": 60,
   "events": [
     {
       "id": "jambase:16725623",
@@ -86,6 +88,15 @@ curl "http://127.0.0.1:8000/events?location=Austin,%20TX&days=7"
   ]
 }
 ```
+
+`location` echoes the query; `resolved_location` reports the place actually
+searched, which can differ (`Austin` → `Austin, TX`).
+
+`total_available` is how many events the provider reports matching the query,
+and `returned_count` is how many this response contains. When
+`returned_count < total_available` the result is **truncated** — this app fetches
+a single upstream page and does not paginate. `total_available` is `null` when
+the provider reported no trustworthy total; it is never guessed.
 
 `event_time` is `null` when JamBase publishes a date but no showtime.
 `price_range` is `null` when no ticket offer publishes a price, or when priced

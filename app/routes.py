@@ -14,7 +14,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import FileResponse
 
-from app.models import Event
+from app.models import SearchResult
 from app.providers.base import EventProvider
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -49,13 +49,10 @@ async def list_events(
     ],
     days: Annotated[int, Query(ge=1, le=90, description="Days ahead to search, inclusive of today")] = 7,
 ) -> dict[str, object]:
-    events: list[Event] = await provider.fetch_events(location, days)
-    return {
-        "location": location,
-        "days": days,
-        "count": len(events),
-        "events": [e.model_dump(mode="json") for e in events],
-    }
+    result: SearchResult = await provider.fetch_events(location, days)
+    # `location` echoes what was asked for; `resolved_location` reports what was
+    # actually searched, which can differ ("Austin" -> "Austin, TX").
+    return {"location": location, "days": days, **result.model_dump(mode="json")}
 
 
 @router.get("/", include_in_schema=False)

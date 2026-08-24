@@ -22,7 +22,7 @@ import httpx
 
 from app.cache import TTLCache
 from app.config import Settings
-from app.models import Event, EventStatus, Performer, PriceRange, Venue
+from app.models import Event, EventStatus, Performer, PriceRange, SearchResult, Venue
 from app.providers.base import (
     LocationNotFound,
     ProviderAuthError,
@@ -104,12 +104,12 @@ class JamBaseProvider:
     def __init__(self, client: httpx.AsyncClient, settings: Settings) -> None:
         self._client = client
         self._settings = settings
-        self._events_cache: TTLCache[list[Event]] = TTLCache(settings.event_cache_ttl)
+        self._events_cache: TTLCache[SearchResult] = TTLCache(settings.event_cache_ttl)
         self._city_cache: TTLCache[dict[str, str]] = TTLCache(settings.city_cache_ttl)
 
     # ---------------------------------------------------------------- public
 
-    async def fetch_events(self, location: str, days: int) -> list[Event]:
+    async def fetch_events(self, location: str, days: int) -> SearchResult:
         city = await self._resolve_city(location)
 
         cache_key = f"{city['id']}:{days}"
@@ -136,8 +136,31 @@ class JamBaseProvider:
             if event is not None:
                 events.append(event)
 
-        await self._events_cache.set(cache_key, events)
-        return events
+        result = SearchResult(
+            events=events,
+            total_available=self._total_available(payload, len(events)),
+            resolved_location=city["label"],
+        )
+        await self._events_cache.set(cache_key, result)
+        return result
+
+    @staticmethod
+    def _total_available(payload: dict[str, Any], returned: int) -> int | None:
+        """Normalise JamBase's pagination block into a total we trust, or None.
+
+        The upstream `pagination` shape stops here; callers see only an integer
+        or None. A total smaller than the page we just received is internally
+        inconsistent, so it is discarded rather than reported — an absent total
+        is honest, a wrong one is worse than nothing.
+        """
+        pagination = payload.get("pagination")
+        if not isinstance(pagination, dict):
+            return None
+        total = pagination.get("totalItems")
+        if not isinstance(total, int) or isinstance(total, bool) or total < returned:
+            logger.info("discarding untrustworthy totalItems %r", total)
+            return None
+        return total
 
     # ------------------------------------------------------------- location
 
@@ -173,11 +196,17 @@ class JamBaseProvider:
         if best is None:
             raise LocationNotFound(f"No location matching {query!r} was found.")
 
+        city_name = best.get("name") or name
+        region = _region_code((best.get("address") or {}).get("addressRegion")) or ""
+        # "US-TX" -> "TX"; the API is inconsistent about which form it sends.
+        short_region = region.split("-")[-1] if region else ""
         city = {
             "id": best["identifier"],
-            "name": best.get("name") or name,
-            "region": _region_code((best.get("address") or {}).get("addressRegion"))
-            or "",
+            "name": city_name,
+            "region": short_region,
+            # Pre-formatted for display so the place we actually searched is
+            # visible to the caller, e.g. Austin, TX rather than Austintown, OH.
+            "label": ", ".join(part for part in (city_name, short_region) if part),
         }
         await self._city_cache.set(cache_key, city)
         return city

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from app.models import Event
+from app.models import SearchResult
 
 
 class ProviderError(Exception):
@@ -57,8 +57,11 @@ class LocationNotFound(ProviderError):
 class EventProvider(Protocol):
     """Anything that can turn a human location string into normalised events."""
 
-    async def fetch_events(self, location: str, days: int) -> list[Event]:
+    async def fetch_events(self, location: str, days: int) -> SearchResult:
         """Return events near `location` starting within the next `days` days.
+
+        Returns a `SearchResult` rather than a bare list so callers can tell a
+        complete answer from a truncated one.
 
         Raises:
             LocationNotFound: `location` matched no known place.

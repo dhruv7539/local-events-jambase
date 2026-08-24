@@ -52,12 +52,30 @@ function readError(body, status) {
 }
 
 function render(data) {
+  const where = data.resolved_location || data.location;
   if (!data.events.length) {
-    setStatus(`No events found near ${data.location} in the next ${data.days} day(s).`);
+    setStatus(`No events found near ${where} in the next ${data.days} day(s).`);
     return;
   }
-  setStatus(`${data.count} event${data.count === 1 ? "" : "s"} near ${data.location}.`);
+  setStatus(completenessMessage(data, where));
   results.append(...data.events.map(card));
+}
+
+// The API reports how many events it returned and how many exist. Say which
+// case this is, rather than presenting a truncated page as the whole answer.
+function completenessMessage(data, where) {
+  const n = data.returned_count;
+  const total = data.total_available;
+  const plural = n === 1 ? "" : "s";
+
+  if (typeof total !== "number") {
+    // The provider gave no trustworthy total, so we don't invent one.
+    return `Showing ${n} event${plural} near ${where}. The provider did not report a total, so there may be more.`;
+  }
+  if (n < total) {
+    return `Showing the first ${n} of ${total} upcoming events near ${where}.`;
+  }
+  return `${n} event${plural} near ${where}.`;
 }
 
 function card(event) {

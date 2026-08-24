@@ -87,21 +87,21 @@ def events():
 
 @pytest.mark.asyncio
 async def test_every_fixture_event_normalises(events):
-    result = await events.fetch_events("Austin, TX", 7)
+    result = (await events.fetch_events("Austin, TX", 7)).events
     assert len(result) == len(RAW_EVENTS)
 
 
 @pytest.mark.asyncio
 async def test_empty_string_previous_date_becomes_none(events):
     """JamBase sends "" rather than null. It must not become a date."""
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     scheduled = [e for e in result if e.status is EventStatus.SCHEDULED]
     assert scheduled and all(e.previous_date is None for e in scheduled)
 
 
 @pytest.mark.asyncio
 async def test_rescheduled_event_keeps_original_date(events):
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     moved = by_name(result, "Lefty Gunplay")
     assert moved.status is EventStatus.RESCHEDULED
     assert moved.previous_date == date(2026, 9, 2)
@@ -111,13 +111,13 @@ async def test_rescheduled_event_keeps_original_date(events):
 async def test_cancelled_event_is_kept_not_dropped(events):
     """A cancelled show is the thing a user most needs to see, so it is
     surfaced and flagged rather than filtered out."""
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     assert by_name(result, "Kill Bill").status is EventStatus.CANCELLED
 
 
 @pytest.mark.asyncio
 async def test_date_only_event_has_no_invented_time(events):
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     festival = by_name(result, "Bat Fest")
     assert festival.event_date == date(2026, 9, 5)
     assert festival.event_time is None
@@ -125,14 +125,14 @@ async def test_date_only_event_has_no_invented_time(events):
 
 @pytest.mark.asyncio
 async def test_datetime_event_keeps_its_showtime(events):
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     assert by_name(result, "Bob Schneider").event_time == time(20, 30)
 
 
 @pytest.mark.asyncio
 async def test_string_prices_are_coerced_to_decimal(events):
     """The spec declares `number`; the API sends "15.00"."""
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     priced = by_name(result, "Bob Schneider").price_range
     assert priced is not None
     assert priced.min_price == Decimal("15.00")
@@ -142,7 +142,7 @@ async def test_string_prices_are_coerced_to_decimal(events):
 
 @pytest.mark.asyncio
 async def test_event_without_offers_has_no_ticket_link_or_price(events):
-    result = await events.fetch_events("Austin", 7)
+    result = (await events.fetch_events("Austin", 7)).events
     bare = by_name(result, "Tommy Emmanuel")
     assert bare.ticket_url is None
     assert bare.price_range is None
@@ -299,3 +299,47 @@ async def test_different_day_range_is_a_separate_cache_entry():
     assert len(event_calls) == 2
     # City resolution is cached separately and for longer, so it happens once.
     assert len([c for c in calls if "/geographies" in c]) == 1
+
+
+# ------------------------------------------------------- completeness metadata
+
+
+@pytest.mark.asyncio
+async def test_result_reports_total_available_and_resolved_location():
+    def handler(request):
+        if "/geographies/cities" in request.url.path:
+            return httpx.Response(200, json=CITIES)
+        return httpx.Response(200, json=FIXTURE | {"pagination": {"totalItems": 268}})
+
+    result = await make_provider(handler).fetch_events("Austin", 7)
+    assert result.total_available == 268
+    assert result.returned_count == len(result.events) == len(RAW_EVENTS)
+    assert result.resolved_location == "Austin, TX"
+
+
+@pytest.mark.asyncio
+async def test_missing_pagination_reports_unknown_total_not_a_guess():
+    result = await make_provider(happy_handler).fetch_events("Austin", 7)
+    assert result.total_available is None
+
+
+@pytest.mark.asyncio
+async def test_total_smaller_than_page_is_discarded_as_untrustworthy():
+    """A total below what we just received is internally inconsistent, so it is
+    reported as unknown rather than passed through."""
+
+    def handler(request):
+        if "/geographies/cities" in request.url.path:
+            return httpx.Response(200, json=CITIES)
+        return httpx.Response(200, json=FIXTURE | {"pagination": {"totalItems": 2}})
+
+    result = await make_provider(handler).fetch_events("Austin", 7)
+    assert result.total_available is None
+
+
+def test_returned_count_cannot_disagree_with_events():
+    from app.models import SearchResult
+
+    result = SearchResult(events=[], total_available=99, resolved_location="X")
+    assert result.returned_count == 0
+    assert "returned_count" in result.model_dump()

@@ -108,3 +108,33 @@ class Event(BaseModel):
         """Headliner's genres, de-duplicated, order preserved."""
         performer = self._headliner
         return list(dict.fromkeys(performer.genres)) if performer else []
+
+
+class SearchResult(BaseModel):
+    """The outcome of one event search, including how complete it is.
+
+    A bare `list[Event]` cannot express whether it is the whole answer. JamBase
+    routinely reports far more matching events than one page returns (268 for a
+    30-day Austin search against the 100 we request), and a list alone presents
+    that truncated slice as if it were everything — which is the same class of
+    error as showing $0 for an unpublished price.
+
+    `total_available` is `None` when the provider did not report a trustworthy
+    total. Absent metadata is reported as absent, never as a number we do not
+    trust.
+    """
+
+    events: list[Event]
+    total_available: int | None = None
+    resolved_location: str
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def returned_count(self) -> int:
+        """Always equals len(events).
+
+        Derived rather than stored so the invariant cannot be violated by a
+        caller: there is no way to construct a SearchResult whose count
+        disagrees with its events.
+        """
+        return len(self.events)
