@@ -27,7 +27,11 @@ from app.providers.base import (
     ProviderTimeout,
     ProviderUnavailable,
 )
-from app.providers.jambase import JamBaseProvider
+from app.providers.jambase import (
+    MAX_ATTEMPTS,
+    RETRY_DELAY_SECONDS,
+    JamBaseProvider,
+)
 
 FIXTURE = json.loads(
     (Path(__file__).parent / "fixtures" / "jambase_events.json").read_text()
@@ -343,3 +347,112 @@ def test_returned_count_cannot_disagree_with_events():
     result = SearchResult(events=[], total_available=99, resolved_location="X")
     assert result.returned_count == 0
     assert "returned_count" in result.model_dump()
+
+
+# --------------------------------------------------------------------- retry
+
+
+@pytest.fixture
+def no_delay(monkeypatch):
+    """Keep the retry policy intact but remove the wall-clock cost."""
+    monkeypatch.setattr("app.providers.jambase.RETRY_DELAY_SECONDS", 0)
+    monkeypatch.setattr("app.providers.jambase.MAX_RETRY_AFTER_SECONDS", 0)
+
+
+def counting_handler(responses):
+    """Serve `responses` in order, recording how many attempts were made."""
+    attempts: list[httpx.Request] = []
+
+    def handler(request):
+        attempts.append(request)
+        item = responses[min(len(attempts) - 1, len(responses) - 1)]
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+    return handler, attempts
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [429, 502, 503, 504])
+async def test_transient_status_is_retried_once_then_succeeds(status, no_delay):
+    handler, attempts = counting_handler(
+        [httpx.Response(status), httpx.Response(200, json=CITIES)]
+    )
+    provider = make_provider(handler)
+    await provider._resolve_city("Austin")
+    assert len(attempts) == 2, "expected exactly one retry"
+
+
+@pytest.mark.asyncio
+async def test_connect_error_is_retried_once_then_succeeds(no_delay):
+    handler, attempts = counting_handler(
+        [httpx.ConnectError("refused"), httpx.Response(200, json=CITIES)]
+    )
+    await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [400, 401, 403, 404, 422])
+async def test_deterministic_4xx_is_never_retried(status, no_delay):
+    handler, attempts = counting_handler([httpx.Response(status, text="nope")])
+    with pytest.raises((ProviderUnavailable, ProviderAuthError)):
+        await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == 1, "a deterministic client error must not be retried"
+
+
+@pytest.mark.asyncio
+async def test_read_timeout_is_not_retried(no_delay):
+    """The request already spent its full budget; retrying doubles the wait."""
+    handler, attempts = counting_handler([httpx.ReadTimeout("slow")])
+    with pytest.raises(ProviderTimeout):
+        await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == 1
+
+
+@pytest.mark.asyncio
+async def test_exhausted_retry_still_produces_a_clean_provider_error(no_delay):
+    handler, attempts = counting_handler([httpx.Response(503, text="still down")])
+    with pytest.raises(ProviderUnavailable) as excinfo:
+        await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == MAX_ATTEMPTS
+    assert "still down" not in str(excinfo.value)
+
+
+@pytest.mark.asyncio
+async def test_exhausted_connect_retry_maps_to_unavailable(no_delay):
+    handler, attempts = counting_handler([httpx.ConnectError("refused")])
+    with pytest.raises(ProviderUnavailable):
+        await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == MAX_ATTEMPTS
+
+
+@pytest.mark.asyncio
+async def test_long_retry_after_fails_cleanly_instead_of_blocking(no_delay):
+    """A provider asking for a 300s wait must not stall an interactive request."""
+    handler, attempts = counting_handler(
+        [httpx.Response(429, headers={"Retry-After": "300"})]
+    )
+    with pytest.raises(ProviderUnavailable):
+        await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == 1, "should fail immediately, not retry or sleep"
+
+
+@pytest.mark.asyncio
+async def test_unparseable_retry_after_fails_cleanly(no_delay):
+    handler, attempts = counting_handler(
+        [httpx.Response(429, headers={"Retry-After": "Wed, 21 Oct 2026 07:28:00 GMT"})]
+    )
+    with pytest.raises(ProviderUnavailable):
+        await make_provider(handler)._resolve_city("Austin")
+    assert len(attempts) == 1
+
+
+def test_short_retry_after_is_honoured():
+    response = httpx.Response(429, headers={"Retry-After": "1"})
+    assert JamBaseProvider._retry_delay(response) == 1.0
+
+
+def test_absent_retry_after_uses_our_own_short_delay():
+    assert JamBaseProvider._retry_delay(httpx.Response(503)) == RETRY_DELAY_SECONDS

@@ -13,6 +13,7 @@ profiling a real 100-event response:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal, InvalidOperation
@@ -25,6 +26,7 @@ from app.config import Settings
 from app.models import Event, EventStatus, Performer, PriceRange, SearchResult, Venue
 from app.providers.base import (
     LocationNotFound,
+    ProviderError,
     ProviderAuthError,
     ProviderTimeout,
     ProviderUnavailable,
@@ -33,6 +35,36 @@ from app.providers.base import (
 logger = logging.getLogger(__name__)
 
 PRIMARY_TICKET_CATEGORY = "ticketingLinkPrimary"
+
+# --- Retry policy -----------------------------------------------------------
+# Exactly one retry. This is interactive request/response traffic: every extra
+# attempt spends the user's latency and our provider quota to buy a shrinking
+# increment of recovery probability. One retry catches the common case (a single
+# transient blip) without turning a slow upstream into a slow page.
+#
+# This is not rate limiting, and it is not the cache. The cache avoids
+# unnecessary requests; the retry handles transient failures. Neither throttles
+# our own request rate — no token bucket is implemented (see WRITEUP.md).
+MAX_ATTEMPTS = 2
+RETRY_DELAY_SECONDS = 0.25
+# The longest upstream-requested wait we will honour before failing cleanly.
+MAX_RETRY_AFTER_SECONDS = 2.0
+
+# Transient by nature: the request never got a considered answer.
+RETRYABLE_STATUSES = frozenset({429, 502, 503, 504})
+
+# Connection-level failures, which typically fail fast and often succeed on a
+# second attempt. Deliberately EXCLUDES ReadTimeout/WriteTimeout: those mean the
+# request already consumed its entire time budget, so retrying would double an
+# interactive user's wait to buy one more chance at a slow upstream.
+RETRYABLE_TRANSPORT_ERRORS = (
+    httpx.ConnectError,
+    httpx.ConnectTimeout,
+    httpx.PoolTimeout,
+    httpx.ReadError,
+    httpx.WriteError,
+    httpx.RemoteProtocolError,
+)
 
 
 def _clean(value: Any) -> str | None:
@@ -248,34 +280,93 @@ class JamBaseProvider:
     # ------------------------------------------------------------ transport
 
     async def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
-        """Issue one upstream request, translating every failure mode.
+        """Issue one upstream request, retrying once on transient failure.
 
         Upstream bodies are logged but never re-raised to the caller, so
         provider internals cannot leak through an error response.
         """
         url = f"{self._settings.jambase_base_url}{path}"
-        try:
-            response = await self._client.get(
-                url,
-                params=params,
-                headers={"Authorization": f"Bearer {self._settings.jambase_api_key}"},
-            )
-        except httpx.TimeoutException as exc:
-            logger.warning("jambase timeout on %s: %s", path, exc)
-            raise ProviderTimeout() from exc
-        except httpx.HTTPError as exc:
-            logger.warning("jambase transport error on %s: %s", path, exc)
-            raise ProviderUnavailable() from exc
+        headers = {"Authorization": f"Bearer {self._settings.jambase_api_key}"}
 
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            final_attempt = attempt == MAX_ATTEMPTS
+            try:
+                response = await self._client.get(url, params=params, headers=headers)
+            except RETRYABLE_TRANSPORT_ERRORS as exc:
+                if final_attempt:
+                    logger.warning("jambase transport error on %s: %s", path, exc)
+                    raise self._transport_failure(exc) from exc
+                logger.info(
+                    "jambase transport error on %s (attempt %d), retrying: %s",
+                    path, attempt, exc,
+                )
+                await asyncio.sleep(RETRY_DELAY_SECONDS)
+                continue
+            except httpx.TimeoutException as exc:
+                # Read/write timeout: the budget is already spent. Not retried.
+                logger.warning("jambase timeout on %s: %s", path, exc)
+                raise ProviderTimeout() from exc
+            except httpx.HTTPError as exc:
+                logger.warning("jambase transport error on %s: %s", path, exc)
+                raise ProviderUnavailable() from exc
+
+            if response.status_code in RETRYABLE_STATUSES and not final_attempt:
+                delay = self._retry_delay(response)
+                if delay is None:
+                    logger.warning(
+                        "jambase returned %s on %s and asked for a wait too long "
+                        "for an interactive request; failing",
+                        response.status_code, path,
+                    )
+                    raise ProviderUnavailable()
+                logger.info(
+                    "jambase returned %s on %s (attempt %d), retrying in %.2fs",
+                    response.status_code, path, attempt, delay,
+                )
+                await asyncio.sleep(delay)
+                continue
+
+            return self._read_payload(response, path)
+
+        # Unreachable: the final attempt always returns or raises above.
+        raise ProviderUnavailable()
+
+    @staticmethod
+    def _transport_failure(exc: Exception) -> ProviderError:
+        """Connect timeouts are still timeouts; everything else is unavailability."""
+        if isinstance(exc, httpx.TimeoutException):
+            return ProviderTimeout()
+        return ProviderUnavailable()
+
+    @staticmethod
+    def _retry_delay(response: httpx.Response) -> float | None:
+        """How long to wait before the retry, or None to fail immediately.
+
+        Honours `Retry-After` only when it is a small number of seconds. A long
+        or unparseable value (including the HTTP-date form) means we fail
+        cleanly rather than either ignoring the provider's instruction or
+        blocking an interactive request for an unbounded time.
+        """
+        raw = response.headers.get("Retry-After")
+        if raw is None:
+            return RETRY_DELAY_SECONDS
+        try:
+            requested = float(raw.strip())
+        except (AttributeError, ValueError):
+            return None
+        if requested > MAX_RETRY_AFTER_SECONDS:
+            return None
+        return max(requested, 0.0)
+
+    def _read_payload(self, response: httpx.Response, path: str) -> dict[str, Any]:
+        """Translate a final (non-retryable) response into a payload or error."""
         if response.status_code == 401:
             logger.error("jambase rejected our credentials on %s", path)
             raise ProviderAuthError()
         if response.status_code >= 400:
             logger.warning(
                 "jambase returned %s on %s: %s",
-                response.status_code,
-                path,
-                response.text[:500],
+                response.status_code, path, response.text[:500],
             )
             raise ProviderUnavailable()
 
