@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Live Events",
+        title="Local Events",
         description="Find live music events near a location.",
         version="1.0.0",
         lifespan=lifespan,

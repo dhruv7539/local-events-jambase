@@ -1,7 +1,12 @@
-# Live Events
+# Local Events
 
 Find live music events near a location. FastAPI backend over the JamBase v3 API,
 with a small static single-page UI.
+
+## Technical writeup
+
+See [WRITEUP.md](WRITEUP.md) for architecture decisions, tradeoffs, AI usage,
+limitations, and the multi-provider design.
 
 ## Requirements
 
@@ -55,13 +60,15 @@ Then open http://127.0.0.1:8000.
 curl "http://127.0.0.1:8000/events?location=Austin,%20TX&days=7"
 ```
 
+**Abridged example:** the `events` array below shows one of the 57 returned events.
+
 ```json
 {
   "location": "Austin, TX",
   "resolved_location": "Austin, TX",
   "days": 7,
-  "total_available": 260,
-  "returned_count": 60,
+  "total_available": 57,
+  "returned_count": 57,
   "events": [
     {
       "id": "jambase:16725623",
@@ -138,7 +145,7 @@ any external client would.
 pytest
 ```
 
-79 tests, no network and no API key required.
+80 tests, no network and no API key required.
 
 - `tests/test_normalize.py` — the adapter: normalisation, city resolution,
   retry policy, failure translation and cache TTL behaviour. The transport is

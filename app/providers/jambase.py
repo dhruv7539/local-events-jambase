@@ -146,7 +146,7 @@ class JamBaseProvider:
 
         The per-request httpx timeouts bound each individual upstream call, but
         a cold search makes two of them and each is retryable, so those limits
-        alone left total latency unbounded in the worst case. This deadline
+        alone allowed aggregate latency to reach roughly 20 seconds in the worst case. This deadline
         covers the entire workflow — city resolution, the event fetch, and any
         retry delays between them — and surfaces as the same ProviderTimeout,
         so callers see the existing clean 504 either way.
