@@ -1,0 +1,1328 @@
+{
+ "success": true,
+ "events": [
+  {
+   "@type": "Concert",
+   "name": "Kill Bill: The Rapper at Empire Garage",
+   "identifier": "jambase:16217260",
+   "url": "https://www.jambase.com/show/kill-bill-the-rapper-empire-garage-20260826",
+   "image": "https://www.jambase.com/wp-content/uploads/2023/04/kill-bill-the-rapper-1480x832.png",
+   "sameAs": [],
+   "datePublished": "2026-05-01T20:01:18Z",
+   "dateModified": "2026-07-10T13:13:18Z",
+   "eventStatus": "cancelled",
+   "startDate": "2026-08-26T21:00:00",
+   "endDate": "2026-08-26",
+   "previousStartDate": "",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Empire Garage",
+    "identifier": "jambase:7854410",
+    "url": "https://www.jambase.com/venue/empire-garage",
+    "image": "",
+    "datePublished": "2021-08-25T14:44:20Z",
+    "dateModified": "2026-08-24T21:18:10Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "606 E. 7th Street",
+     "addressLocality": "Austin",
+     "postalCode": "78701",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.2674,
+     "longitude": -97.7361
+    },
+    "sameAs": [
+     {
+      "@type": "URL",
+      "identifier": "officialSite",
+      "url": "https://empireatx.com/garage-3/"
+     }
+    ],
+    "maximumAttendeeCapacity": 1050,
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 4
+   },
+   "offers": [
+    {
+     "@type": "Offer",
+     "name": "Kill Bill: The Rapper [CANCELED] Austin Tickets on Ticketmaster",
+     "identifier": "jambase:16217263",
+     "url": "https://ticketmaster.evyy.net/c/252938/264167/4272?u=https%3A%2F%2Fwww.ticketmaster.com%2Fkill-bill-the-rapper-austin-texas-08-26-2026%2Fevent%2F3A00649DF5F72604&utm_medium=affiliate",
+     "datePublished": "2026-05-01T20:01:19Z",
+     "dateModified": "2026-07-07T22:37:14Z",
+     "category": "ticketingLinkPrimary",
+     "priceSpecification": {
+      "@type": "PriceSpecification",
+      "minPrice": "31.61",
+      "maxPrice": "74.05",
+      "price": "31.61",
+      "priceCurrency": "USD"
+     },
+     "seller": {
+      "@type": "Organization",
+      "name": "Ticketmaster",
+      "identifier": "ticketmaster",
+      "disambiguatingDescription": "eventTicketVendorPrimary"
+     },
+     "validFrom": "2026-05-01T20:01:19Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Kill Bill: The Rapper [CANCELED] Austin Tickets on StubHub",
+     "identifier": "jambase:16227211",
+     "url": "https://stubhub.prf.hn/click/camref:1011l9QnS/destination:https://www.stubhub.com/kill-bill-the-rapper-austin-tickets-8-26-2026/event/161039200/?utm_source=jambase",
+     "datePublished": "2026-05-04T23:47:29Z",
+     "dateModified": "2026-05-04T23:47:32Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "StubHub",
+      "identifier": "stubhub",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-05-04T23:47:29Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Kill Bill: The Rapper [CANCELED] Austin Tickets on Viagogo",
+     "identifier": "jambase:16220260",
+     "url": "https://viagogo.prf.hn/click/camref:1100luJMS/destination:https://www.viagogo.com/E-161039200?utm_source=jambase",
+     "datePublished": "2026-05-01T23:22:04Z",
+     "dateModified": "2026-05-01T23:22:09Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Viagogo",
+      "identifier": "viagogo",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-05-01T23:22:04Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Kill Bill: The Rapper [CANCELED] Austin Tickets on Vivid Seats",
+     "identifier": "jambase:16649624",
+     "url": "https://vivid-seats.pxf.io/c/252938/1017970/12730?prodsku=6977174&u=https%3A%2F%2Fwww.vividseats.com%2Fkill-bill---the-rapper-tickets-austin-empire---garage-8-26-2026%2Fproduction%2F6977174%3Futm_term%3Dproduction-6977174&intsrc=CATF_7904&utm_source=jambase",
+     "datePublished": "2026-06-30T23:14:46Z",
+     "dateModified": "2026-06-30T23:14:48Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Vivid Seats",
+      "identifier": "vividseats",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-06-30T23:14:46Z",
+     "x-spansDays": 1
+    }
+   ],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "Kill Bill: The Rapper",
+     "identifier": "jambase:8134327",
+     "url": "https://www.jambase.com/band/kill-bill-the-rapper",
+     "image": "https://www.jambase.com/wp-content/uploads/2023/04/kill-bill-the-rapper-1480x832.png",
+     "datePublished": "2021-11-17T22:57:16Z",
+     "dateModified": "2026-08-23T08:07:21Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 4,
+     "genre": [
+      "hip-hop-rap"
+     ],
+     "x-performanceDate": "2026-08-26",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Ashtin Larold",
+     "identifier": "jambase:3962585",
+     "url": "https://www.jambase.com/band/ashtin-larold",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2018-02-09T16:03:25Z",
+     "dateModified": "2026-08-20T08:07:19Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 3,
+     "genre": [],
+     "x-performanceDate": "2026-08-26",
+     "x-performanceRank": 2,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "x-streamIds": [],
+   "x-headlinerInSupport": false,
+   "x-promoImage": "",
+   "x-customTitle": "",
+   "x-subtitle": ""
+  },
+  {
+   "@type": "Concert",
+   "name": "Lefty Gunplay at Antone\u2019s",
+   "identifier": "jambase:16099533",
+   "url": "https://www.jambase.com/show/lefty-gunplay-antones-20260901",
+   "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+   "sameAs": [],
+   "datePublished": "2026-04-18T00:13:57Z",
+   "dateModified": "2026-08-24T19:27:01Z",
+   "eventStatus": "rescheduled",
+   "startDate": "2026-09-01T20:00:00",
+   "endDate": "2026-09-01",
+   "previousStartDate": "2026-09-02",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Antone\u2019s",
+    "identifier": "jambase:347060",
+    "url": "https://www.jambase.com/venue/antones",
+    "image": "",
+    "datePublished": "2015-08-13T11:45:13Z",
+    "dateModified": "2026-08-23T14:17:06Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "305 E 5th St",
+     "addressLocality": "Austin",
+     "postalCode": "78701",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.266,
+     "longitude": -97.7426
+    },
+    "sameAs": [
+     {
+      "@type": "URL",
+      "identifier": "officialSite",
+      "url": "https://www.antonesnightclub.com/"
+     }
+    ],
+    "maximumAttendeeCapacity": 400,
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 50
+   },
+   "offers": [
+    {
+     "@type": "Offer",
+     "name": "Lefty Gunplay Austin Tickets on Ticketmaster",
+     "identifier": "jambase:16099535",
+     "url": "https://ticketmaster.evyy.net/c/252938/271177/4272?u=https%3A%2F%2Fwww.ticketmaster.com%2Flefty-gunplay-w-rnbfoemob-austin-texas-09-01-2026%2Fevent%2F3A00648FC282B727%3Futm_content%3Dhotevent&utm_medium=affiliate&utm_source=jambase",
+     "datePublished": "2026-04-18T00:13:58Z",
+     "dateModified": "2026-08-13T15:14:05Z",
+     "category": "ticketingLinkPrimary",
+     "priceSpecification": {
+      "@type": "PriceSpecification",
+      "minPrice": "27.85",
+      "maxPrice": "183.55",
+      "price": "27.85",
+      "priceCurrency": "USD"
+     },
+     "seller": {
+      "@type": "Organization",
+      "name": "Ticketmaster",
+      "identifier": "ticketmaster",
+      "disambiguatingDescription": "eventTicketVendorPrimary"
+     },
+     "validFrom": "2026-04-18T00:13:58Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Lefty Gunplay Austin Tickets on SeatGeek",
+     "identifier": "jambase:16423514",
+     "url": "https://seatgeek.pxf.io/c/252938/1756891/20501?url=https%3A%2F%2Fseatgeek.com%2Flefty-gunplay-tickets%2Faustin-texas-antone-s-nightclub-2026-09-02-8-pm%2Fconcert%2F18276850&utm_source=jambase",
+     "datePublished": "2026-06-01T22:04:03Z",
+     "dateModified": "2026-06-01T22:04:05Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "SeatGeek",
+      "identifier": "seatgeek",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-06-01T22:04:03Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Lefty Gunplay Austin Tickets on StubHub",
+     "identifier": "jambase:16106953",
+     "url": "https://stubhub.prf.hn/click/camref:1011l9QnS/destination:https://www.stubhub.com/lefty-gunplay-austin-tickets-9-2-2026/event/160930728/?utm_source=jambase",
+     "datePublished": "2026-04-20T19:26:40Z",
+     "dateModified": "2026-04-20T19:26:45Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "StubHub",
+      "identifier": "stubhub",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-04-20T19:26:40Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Lefty Gunplay Austin Tickets on TickPick",
+     "identifier": "jambase:16252054",
+     "url": "https://tickpick.dgrk2e.net/c/252938/2119338/10353?prodsku=7891990&u=https%3A%2F%2Fwww.tickpick.com%2Fbuy-lefty-gunplay-tickets-antones-nightclub-9-2-26-8pm%2F7891990%2F&intsrc=CATF_18575&utm_source=jambase",
+     "datePublished": "2026-05-07T21:48:13Z",
+     "dateModified": "2026-05-07T21:48:14Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "TickPick",
+      "identifier": "tickpick",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-05-07T21:48:13Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Lefty Gunplay Austin Tickets on Viagogo",
+     "identifier": "jambase:16106955",
+     "url": "https://viagogo.prf.hn/click/camref:1100luJMS/destination:https://www.viagogo.com/E-160930728?utm_source=jambase",
+     "datePublished": "2026-04-20T19:26:40Z",
+     "dateModified": "2026-04-20T19:26:45Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Viagogo",
+      "identifier": "viagogo",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-04-20T19:26:40Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Lefty Gunplay Austin Tickets on Vivid Seats",
+     "identifier": "jambase:16160770",
+     "url": "https://vivid-seats.pxf.io/c/252938/1017970/12730?prodsku=6920554&u=https%3A%2F%2Fwww.vividseats.com%2Flefty-gunplay-tickets-austin-antones---austin-9-2-2026%2Fproduction%2F6920554%3Futm_term%3Dproduction-6920554&intsrc=CATF_7904&utm_source=jambase",
+     "datePublished": "2026-04-28T00:18:42Z",
+     "dateModified": "2026-04-28T00:18:55Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Vivid Seats",
+      "identifier": "vividseats",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-04-28T00:18:42Z",
+     "x-spansDays": 1
+    }
+   ],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "Lefty Gunplay",
+     "identifier": "jambase:12858712",
+     "url": "https://www.jambase.com/band/lefty-gunplay",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2024-09-25T17:33:11Z",
+     "dateModified": "2026-08-24T19:27:01Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 6,
+     "genre": [
+      "hip-hop-rap"
+     ],
+     "x-performanceDate": "2026-09-01",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "x-streamIds": [],
+   "x-headlinerInSupport": false,
+   "x-promoImage": "",
+   "x-customTitle": "",
+   "x-subtitle": ""
+  },
+  {
+   "@type": "Festival",
+   "name": "Bat Fest",
+   "identifier": "jambase:16678265",
+   "url": "https://www.jambase.com/festival/bat-fest-2026",
+   "image": "https://www.jambase.com/wp-content/uploads/2023/07/bat-fest-2023-featured-e1688586953776-1480x832.jpg",
+   "datePublished": "2026-07-02T15:07:29Z",
+   "dateModified": "2026-07-07T21:30:44Z",
+   "eventStatus": "scheduled",
+   "startDate": "2026-09-05",
+   "endDate": "2026-09-05",
+   "previousStartDate": "",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Batfest",
+    "identifier": "jambase:324580",
+    "url": "https://www.jambase.com/venue/batfest",
+    "image": "",
+    "datePublished": "2015-08-13T08:09:13Z",
+    "dateModified": "2026-07-07T21:30:44Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "100 South Congress Avenue",
+     "addressLocality": "Austin",
+     "postalCode": "78704",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.2641,
+     "longitude": -97.7447
+    },
+    "sameAs": [],
+    "maximumAttendeeCapacity": "",
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 1
+   },
+   "offers": [
+    {
+     "@type": "Offer",
+     "name": "Bat Fest Tickets on Ticketing Site",
+     "identifier": "jambase:16678266",
+     "url": "https://ticketbud.com/events/5e24429e-73e5-11f1-993c-42010a71701c",
+     "datePublished": "2026-07-02T15:07:30Z",
+     "dateModified": "2026-07-02T15:07:30Z",
+     "category": "ticketingLinkPrimary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Ticketing Site",
+      "identifier": "ticket-provider",
+      "disambiguatingDescription": "eventTicketVendorPrimary"
+     },
+     "validFrom": "2026-07-02T15:07:30Z"
+    }
+   ],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "Brooklyn Michelle",
+     "identifier": "jambase:6285892",
+     "url": "https://www.jambase.com/band/brooklyn-michelle",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2020-01-13T21:08:24Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "M\u00e9lat",
+     "identifier": "jambase:3218429",
+     "url": "https://www.jambase.com/band/melat",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2017-05-04T13:59:40Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 2,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Curtis Lee",
+     "identifier": "jambase:4226608",
+     "url": "https://www.jambase.com/band/curtis-lee",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2018-04-24T21:26:22Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 3,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "J Soulja",
+     "identifier": "jambase:8955933",
+     "url": "https://www.jambase.com/band/j-soulja",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2022-07-05T19:33:35Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 4,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Blakchyl",
+     "identifier": "jambase:10026393",
+     "url": "https://www.jambase.com/band/blakchyl",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2023-03-09T17:17:00Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 5,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Patricia Vonne",
+     "identifier": "jambase:258290",
+     "url": "https://www.jambase.com/band/patricia-vonne",
+     "image": "https://www.jambase.com/wp-content/uploads/2024/09/patricia-vonne-1480x832.png",
+     "datePublished": "2015-07-15T06:25:17Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [
+      "latin"
+     ],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 6,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Elijah Delgado",
+     "identifier": "jambase:6157469",
+     "url": "https://www.jambase.com/band/elijah-delgado",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/11/elijah-delgado1_1200x628_jb_cropped-1-1480x832.png",
+     "datePublished": "2019-11-22T20:50:37Z",
+     "dateModified": "2026-08-20T15:26:30Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 2,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 7,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Eddie Angel",
+     "identifier": "jambase:4886672",
+     "url": "https://www.jambase.com/band/eddie-angel",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2018-11-14T16:59:53Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 8,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Sertified",
+     "identifier": "jambase:1489893",
+     "url": "https://www.jambase.com/band/sertified",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2015-10-24T12:56:22Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 9,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Evita",
+     "identifier": "jambase:262292",
+     "url": "https://www.jambase.com/band/evita",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2015-07-15T15:41:32Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 10,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Jelly Ellington",
+     "identifier": "jambase:3156557",
+     "url": "https://www.jambase.com/band/jelly-ellington",
+     "image": "https://www.jambase.com/wp-content/uploads/2017/04/jelly-ellington-profile-2021-1480x832.jpg",
+     "datePublished": "2017-04-24T03:16:34Z",
+     "dateModified": "2026-08-17T13:24:26Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 3,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 11,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Tomar Williams",
+     "identifier": "jambase:16678281",
+     "url": "https://www.jambase.com/band/tomar-williams",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2026-07-02T15:10:37Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 12,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Nagavalli",
+     "identifier": "jambase:5746977",
+     "url": "https://www.jambase.com/band/nagavalli",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2019-07-09T23:56:24Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 13,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "Wild Child",
+     "identifier": "jambase:576395",
+     "url": "https://www.jambase.com/band/wild-child",
+     "image": "https://www.jambase.com/wp-content/uploads/2015/09/wild_child_highres_courtney_chavanell3--1480x832.jpg",
+     "datePublished": "2015-09-24T19:51:46Z",
+     "dateModified": "2026-08-16T08:07:20Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [
+      "americana",
+      "folk",
+      "indie"
+     ],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 14,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    },
+    {
+     "@type": "MusicGroup",
+     "name": "DJ Grip",
+     "identifier": "jambase:5808862",
+     "url": "https://www.jambase.com/band/dj-grip",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2019-07-30T13:08:47Z",
+     "dateModified": "2026-07-07T21:34:04Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 1,
+     "genre": [],
+     "x-performanceDate": "2026-09-05",
+     "x-performanceRank": 15,
+     "x-isHeadliner": false,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "sameAs": [
+    {
+     "@type": "URL",
+     "identifier": "officialSite",
+     "url": "http://www.roadwayevents.com/event/bat-fest/"
+    },
+    {
+     "@type": "URL",
+     "identifier": "facebook",
+     "url": "https://www.facebook.com/RoadwayProductions"
+    },
+    {
+     "@type": "URL",
+     "identifier": "instagram",
+     "url": "https://www.instagram.com/batfestatx/"
+    }
+   ],
+   "x-promoImage": "",
+   "x-lineupDisplayOption": "daybyday"
+  },
+  {
+   "@type": "Concert",
+   "name": "Bob Schneider at Saxon Pub",
+   "identifier": "jambase:16725623",
+   "url": "https://www.jambase.com/show/bob-schneider-saxon-pub-20260824",
+   "image": "https://www.jambase.com/wp-content/uploads/2017/02/bob-schneider-bob-schneider-4495f311-b60b-421b-a736-9285a82a3097_58261_RETINA_LANDSCAPE_16_9-1480x832.jpg",
+   "sameAs": [],
+   "datePublished": "2026-07-13T15:50:28Z",
+   "dateModified": "2026-08-13T13:28:09Z",
+   "eventStatus": "scheduled",
+   "startDate": "2026-08-24T20:30:00",
+   "endDate": "2026-08-24",
+   "previousStartDate": "",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Saxon Pub",
+    "identifier": "jambase:62668",
+    "url": "https://www.jambase.com/venue/saxon-pub",
+    "image": "",
+    "datePublished": "2015-06-22T07:44:39Z",
+    "dateModified": "2026-08-18T14:18:05Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "1320 South Lamar",
+     "addressLocality": "Austin",
+     "postalCode": "78704",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.2548,
+     "longitude": -97.7624
+    },
+    "sameAs": [
+     {
+      "@type": "URL",
+      "identifier": "officialSite",
+      "url": "https://www.thesaxonpub.com/"
+     }
+    ],
+    "maximumAttendeeCapacity": 150,
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 15
+   },
+   "offers": [
+    {
+     "@type": "Offer",
+     "name": "Bob Schneider Austin Tickets on EventBrite",
+     "identifier": "jambase:16725625",
+     "url": "https://www.eventbrite.com/e/1993553287548?aff=ebdijbjambase&utm_source=jambase",
+     "datePublished": "2026-07-13T15:50:28Z",
+     "dateModified": "2026-07-13T15:50:33Z",
+     "category": "ticketingLinkPrimary",
+     "priceSpecification": {
+      "@type": "PriceSpecification",
+      "minPrice": "15.00",
+      "maxPrice": "25.00",
+      "price": "15.00",
+      "priceCurrency": "USD"
+     },
+     "seller": {
+      "@type": "Organization",
+      "name": "EventBrite",
+      "identifier": "eventbrite",
+      "disambiguatingDescription": "eventTicketVendorPrimary"
+     },
+     "validFrom": "2026-07-13T15:50:28Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Bob Schneider Austin Tickets on StubHub",
+     "identifier": "jambase:16866601",
+     "url": "https://stubhub.prf.hn/click/camref:1011l9QnS/destination:https://www.stubhub.com/lonelyland-austin-tickets-8-24-2026/event/161805268/?utm_source=jambase",
+     "datePublished": "2026-08-10T22:35:03Z",
+     "dateModified": "2026-08-10T22:35:07Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "StubHub",
+      "identifier": "stubhub",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-08-10T22:35:03Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Bob Schneider Austin Tickets on Viagogo",
+     "identifier": "jambase:16866608",
+     "url": "https://viagogo.prf.hn/click/camref:1100luJMS/destination:https://www.viagogo.com/E-161805268?utm_source=jambase",
+     "datePublished": "2026-08-10T22:35:03Z",
+     "dateModified": "2026-08-10T22:35:07Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Viagogo",
+      "identifier": "viagogo",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-08-10T22:35:03Z",
+     "x-spansDays": 1
+    }
+   ],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "Bob Schneider",
+     "identifier": "jambase:41884",
+     "url": "https://www.jambase.com/band/bob-schneider",
+     "image": "https://www.jambase.com/wp-content/uploads/2017/02/bob-schneider-bob-schneider-4495f311-b60b-421b-a736-9285a82a3097_58261_RETINA_LANDSCAPE_16_9-1480x832.jpg",
+     "datePublished": "2015-06-21T06:50:33Z",
+     "dateModified": "2026-08-18T21:11:01Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 17,
+     "genre": [
+      "folk",
+      "indie",
+      "pop"
+     ],
+     "x-performanceDate": "2026-08-24",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "x-streamIds": [],
+   "x-headlinerInSupport": false,
+   "x-promoImage": "",
+   "x-customTitle": "",
+   "x-subtitle": ""
+  },
+  {
+   "@type": "Concert",
+   "name": "Chasen Wayne at Radio/East",
+   "identifier": "jambase:16873486",
+   "url": "https://www.jambase.com/show/chasen-wayne-radio-east-20260824",
+   "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+   "sameAs": [],
+   "datePublished": "2026-08-11T23:23:29Z",
+   "dateModified": "2026-08-17T19:29:38Z",
+   "eventStatus": "scheduled",
+   "startDate": "2026-08-24T19:00:00",
+   "endDate": "2026-08-24",
+   "previousStartDate": "",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Radio/East",
+    "identifier": "jambase:11044468",
+    "url": "https://www.jambase.com/venue/radio-east",
+    "image": "",
+    "datePublished": "2023-09-19T16:13:59Z",
+    "dateModified": "2026-08-23T14:17:06Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "3504 Montopolis Drive",
+     "addressLocality": "Austin",
+     "postalCode": "78744",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.208,
+     "longitude": -97.7155
+    },
+    "sameAs": [
+     {
+      "@type": "URL",
+      "identifier": "officialSite",
+      "url": "https://www.radiocoffeeandbeer.com/"
+     }
+    ],
+    "maximumAttendeeCapacity": 800,
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 34
+   },
+   "offers": [
+    {
+     "@type": "Offer",
+     "name": "Chasen Wayne Austin Tickets on Prekindle",
+     "identifier": "jambase:16873488",
+     "url": "https://www.prekindle.com/promo/id/-2852527949119570362?utm_source=jambase",
+     "datePublished": "2026-08-11T23:23:30Z",
+     "dateModified": "2026-08-11T23:23:37Z",
+     "category": "ticketingLinkPrimary",
+     "priceSpecification": {
+      "@type": "PriceSpecification",
+      "minPrice": "",
+      "maxPrice": "",
+      "price": "10.00",
+      "priceCurrency": "USD"
+     },
+     "seller": {
+      "@type": "Organization",
+      "name": "Prekindle",
+      "identifier": "prekindle",
+      "disambiguatingDescription": "eventTicketVendorPrimary"
+     },
+     "validFrom": "2026-08-11T23:23:30Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "Chasen Wayne Austin Tickets on Vivid Seats",
+     "identifier": "jambase:16908345",
+     "url": "https://vivid-seats.pxf.io/c/252938/1017970/12730?prodsku=7238213&u=https%3A%2F%2Fwww.vividseats.com%2Fchasen-wayne-tickets-austin-radio-east-8-24-2026%2Fproduction%2F7238213%3Futm_term%3Dproduction-7238213&intsrc=CATF_7904&utm_source=jambase",
+     "datePublished": "2026-08-17T19:29:37Z",
+     "dateModified": "2026-08-17T19:29:38Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Vivid Seats",
+      "identifier": "vividseats",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-08-17T19:29:37Z",
+     "x-spansDays": 1
+    }
+   ],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "Chasen Wayne",
+     "identifier": "jambase:16868021",
+     "url": "https://www.jambase.com/band/chasen-wayne",
+     "image": "https://www.jambase.com/wp-content/uploads/2021/08/jambase-default-band-image-bw-1480x832.png",
+     "datePublished": "2026-08-11T17:58:22Z",
+     "dateModified": "2026-08-18T08:07:15Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 2,
+     "genre": [],
+     "x-performanceDate": "2026-08-24",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "x-streamIds": [],
+   "x-headlinerInSupport": false,
+   "x-promoImage": "",
+   "x-customTitle": "",
+   "x-subtitle": ""
+  },
+  {
+   "@type": "Concert",
+   "name": "PawPaw Rod at Antone\u2019s",
+   "identifier": "jambase:15685647",
+   "url": "https://www.jambase.com/show/pawpaw-rod-antones-20260825",
+   "image": "https://www.jambase.com/wp-content/uploads/2023/12/pawpaw-rod-1480x832.png",
+   "sameAs": [],
+   "datePublished": "2026-02-23T18:09:28Z",
+   "dateModified": "2026-07-13T15:15:48Z",
+   "eventStatus": "scheduled",
+   "startDate": "2026-08-25T20:00:00",
+   "endDate": "2026-08-25",
+   "previousStartDate": "",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Antone\u2019s",
+    "identifier": "jambase:347060",
+    "url": "https://www.jambase.com/venue/antones",
+    "image": "",
+    "datePublished": "2015-08-13T11:45:13Z",
+    "dateModified": "2026-08-23T14:17:06Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "305 E 5th St",
+     "addressLocality": "Austin",
+     "postalCode": "78701",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.266,
+     "longitude": -97.7426
+    },
+    "sameAs": [
+     {
+      "@type": "URL",
+      "identifier": "officialSite",
+      "url": "https://www.antonesnightclub.com/"
+     }
+    ],
+    "maximumAttendeeCapacity": 400,
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 50
+   },
+   "offers": [
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on Ticketmaster",
+     "identifier": "jambase:15685649",
+     "url": "https://ticketmaster.evyy.net/c/252938/271177/4272?u=https%3A%2F%2Fwww.ticketmaster.com%2Fpawpaw-rod-picture-day-tour-w-austin-texas-08-25-2026%2Fevent%2F3A00644DDA05B5A8%3Futm_content%3Dhotevent&utm_medium=affiliate&utm_source=jambase",
+     "datePublished": "2026-02-23T18:09:29Z",
+     "dateModified": "2026-07-13T15:15:48Z",
+     "category": "ticketingLinkPrimary",
+     "priceSpecification": {
+      "@type": "PriceSpecification",
+      "minPrice": "34.76",
+      "maxPrice": "116.58",
+      "price": "34.76",
+      "priceCurrency": "USD"
+     },
+     "seller": {
+      "@type": "Organization",
+      "name": "Ticketmaster",
+      "identifier": "ticketmaster",
+      "disambiguatingDescription": "eventTicketVendorPrimary"
+     },
+     "validFrom": "2026-02-23T18:09:29Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on Gametime",
+     "identifier": "jambase:15859690",
+     "url": "https://gametime.hnyj8s.net/c/252938/3217986/10874?prodsku=699a5225fda7968790af1a9e&u=https%3A%2F%2Fgametime.co%2Fno_op%2Fpawpaw-rod-tickets%2F8-25-2026-austin-tx-antones-nightclub%2Fevents%2F699a5225fda7968790af1a9e&intsrc=CATF_26170&utm_source=jambase",
+     "datePublished": "2026-03-11T18:44:47Z",
+     "dateModified": "2026-03-11T18:44:59Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Gametime",
+      "identifier": "gametime",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-03-11T18:44:47Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on SeatGeek",
+     "identifier": "jambase:15812379",
+     "url": "https://seatgeek.pxf.io/c/252938/1756891/20501?url=https%3A%2F%2Fseatgeek.com%2Fpawpaw-rod-tickets%2Faustin-texas-antone-s-nightclub-2026-08-25-8-pm%2Fconcert%2F18085682&utm_source=jambase",
+     "datePublished": "2026-03-09T19:29:13Z",
+     "dateModified": "2026-03-09T19:29:15Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "SeatGeek",
+      "identifier": "seatgeek",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-03-09T19:29:13Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on StubHub",
+     "identifier": "jambase:15812342",
+     "url": "https://stubhub.prf.hn/click/camref:1011l9QnS/destination:https://www.stubhub.com/pawpaw-rod-austin-tickets-8-25-2026/event/160544302/?utm_source=jambase",
+     "datePublished": "2026-03-09T19:29:10Z",
+     "dateModified": "2026-03-09T19:29:43Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "StubHub",
+      "identifier": "stubhub",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-03-09T19:29:10Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on TickPick",
+     "identifier": "jambase:15824897",
+     "url": "https://tickpick.dgrk2e.net/c/252938/2119338/10353?prodsku=7751721&u=https%3A%2F%2Fwww.tickpick.com%2Fbuy-pawpaw-rod-tickets-antones-nightclub-8-25-26-8pm%2F7751721%2F&intsrc=CATF_18575&utm_source=jambase",
+     "datePublished": "2026-03-09T20:28:35Z",
+     "dateModified": "2026-03-09T20:28:42Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "TickPick",
+      "identifier": "tickpick",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-03-09T20:28:35Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on Viagogo",
+     "identifier": "jambase:15812374",
+     "url": "https://viagogo.prf.hn/click/camref:1100luJMS/destination:https://www.viagogo.com/E-160544302?utm_source=jambase",
+     "datePublished": "2026-03-09T19:29:13Z",
+     "dateModified": "2026-03-09T19:29:43Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Viagogo",
+      "identifier": "viagogo",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-03-09T19:29:13Z",
+     "x-spansDays": 1
+    },
+    {
+     "@type": "Offer",
+     "name": "PawPaw Rod Austin Tickets on Vivid Seats",
+     "identifier": "jambase:15824899",
+     "url": "https://vivid-seats.pxf.io/c/252938/1017970/12730?prodsku=6694125&u=https%3A%2F%2Fwww.vividseats.com%2Fpawpaw-rod-tickets-austin-antones---austin-8-25-2026%2Fproduction%2F6694125%3Futm_term%3Dproduction-6694125&intsrc=CATF_7904&utm_source=jambase",
+     "datePublished": "2026-03-09T20:28:35Z",
+     "dateModified": "2026-03-09T20:28:42Z",
+     "category": "ticketingLinkSecondary",
+     "priceSpecification": {},
+     "seller": {
+      "@type": "Organization",
+      "name": "Vivid Seats",
+      "identifier": "vividseats",
+      "disambiguatingDescription": "eventTicketVendorSecondary"
+     },
+     "validFrom": "2026-03-09T20:28:35Z",
+     "x-spansDays": 1
+    }
+   ],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "PawPaw Rod",
+     "identifier": "jambase:8683225",
+     "url": "https://www.jambase.com/band/pawpaw-rod",
+     "image": "https://www.jambase.com/wp-content/uploads/2023/12/pawpaw-rod-1480x832.png",
+     "datePublished": "2022-04-19T17:06:17Z",
+     "dateModified": "2026-08-23T08:07:21Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 12,
+     "genre": [
+      "hip-hop-rap",
+      "indie",
+      "rhythm-and-blues-soul"
+     ],
+     "x-performanceDate": "2026-08-25",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "x-streamIds": [],
+   "x-headlinerInSupport": false,
+   "x-promoImage": "",
+   "x-customTitle": "",
+   "x-subtitle": ""
+  },
+  {
+   "@type": "Concert",
+   "name": "Tommy Emmanuel at Fairmont Austin",
+   "identifier": "jambase:15614271",
+   "url": "https://www.jambase.com/show/tommy-emmanuel-fairmont-austin-20260827",
+   "image": "https://www.jambase.com/wp-content/uploads/2019/10/tommy-emmanuel-ticketmaster-ram-1480x832.jpg",
+   "sameAs": [],
+   "datePublished": "2026-02-05T22:46:10Z",
+   "dateModified": "2026-07-07T21:53:50Z",
+   "eventStatus": "scheduled",
+   "startDate": "2026-08-27T19:00:00",
+   "endDate": "2026-08-27",
+   "previousStartDate": "",
+   "doorTime": "",
+   "location": {
+    "@type": "Venue",
+    "name": "Fairmont Austin",
+    "identifier": "jambase:6115074",
+    "url": "https://www.jambase.com/venue/fairmont-austin",
+    "image": "",
+    "datePublished": "2019-11-11T20:28:47Z",
+    "dateModified": "2026-07-07T21:53:50Z",
+    "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "101 Red River Street",
+     "addressLocality": "Austin",
+     "postalCode": "78701",
+     "addressRegion": {
+      "@type": "State",
+      "identifier": "US-TX",
+      "name": "Texas",
+      "alternateName": "TX"
+     },
+     "addressCountry": {
+      "@type": "Country",
+      "identifier": "US",
+      "name": "United States",
+      "alternateName": "USA"
+     },
+     "x-streetAddress2": "",
+     "x-timezone": "America/Chicago",
+     "x-jamBaseMetroId": 21,
+     "x-jamBaseCityId": 4218489
+    },
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 30.262,
+     "longitude": -97.7381
+    },
+    "sameAs": [],
+    "maximumAttendeeCapacity": "",
+    "x-isPermanentlyClosed": false,
+    "x-numUpcomingEvents": 1
+   },
+   "offers": [],
+   "performer": [
+    {
+     "@type": "MusicGroup",
+     "name": "Tommy Emmanuel",
+     "identifier": "jambase:42632",
+     "url": "https://www.jambase.com/band/tommy-emmanuel",
+     "image": "https://www.jambase.com/wp-content/uploads/2019/10/tommy-emmanuel-ticketmaster-ram-1480x832.jpg",
+     "datePublished": "2015-06-21T06:55:14Z",
+     "dateModified": "2026-08-24T16:41:52Z",
+     "x-bandOrMusician": "band",
+     "x-numUpcomingEvents": 50,
+     "genre": [
+      "bluegrass",
+      "folk",
+      "instrumental",
+      "jazz",
+      "rock"
+     ],
+     "x-performanceDate": "2026-08-27",
+     "x-performanceRank": 1,
+     "x-isHeadliner": true,
+     "x-dateIsConfirmed": true
+    }
+   ],
+   "eventAttendanceMode": "live",
+   "isAccessibleForFree": false,
+   "x-streamIds": [],
+   "x-headlinerInSupport": false,
+   "x-promoImage": "",
+   "x-customTitle": "",
+   "x-subtitle": ""
+  }
+ ]
+}
