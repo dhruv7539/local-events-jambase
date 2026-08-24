@@ -29,7 +29,7 @@ cp .env.example .env
 | `READ_TIMEOUT` | no | `10.0` | Seconds to wait for a response body |
 | `EVENT_CACHE_TTL` | no | `300` | Event result cache, seconds |
 | `CITY_CACHE_TTL` | no | `86400` | City-name→ID cache, seconds |
-| `RESULTS_PER_PAGE` | no | `60` | Events requested upstream (single page) |
+| `RESULTS_PER_PAGE` | no | `100` | Events requested upstream (single page; JamBase's documented max) |
 
 `.env` is gitignored and has been since the first commit.
 
@@ -118,8 +118,13 @@ offers disagree on currency — it is never `0` and never a guess.
 curl http://127.0.0.1:8000/health   # {"status":"ok"}
 ```
 
-Liveness only — it does **not** call JamBase, so an upstream outage doesn't
-fail our health check or burn API quota on every probe.
+**Application liveness only.** `/health` reports whether this process is up and
+able to serve requests; it deliberately does **not** call JamBase. A third-party
+outage should not make this application appear dead and trigger restarts or
+pager alerts for a fault we cannot fix, and health probes fire continuously —
+calling the provider on each one would consume API quota indefinitely for no
+diagnostic gain. Provider availability is already surfaced where it matters, on
+`/events`, which returns 502/504 when the upstream is failing.
 
 ### `GET /`
 

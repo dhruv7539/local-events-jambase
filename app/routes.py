@@ -32,11 +32,12 @@ ProviderDep = Annotated[EventProvider, Depends(get_provider)]
 
 @router.get("/health")
 async def health() -> dict[str, str]:
-    """Liveness only.
+    """Application liveness only.
 
-    Deliberately does not call JamBase: a health check that depends on a third
-    party turns their outage into our restart loop, and would burn quota on a
-    trial key every time a probe fires.
+    Deliberately does not call JamBase. A health check that depends on a third
+    party turns their outage into our restart loop, and probes fire constantly,
+    so calling the provider would consume quota indefinitely for no diagnostic
+    gain. Provider availability is surfaced on /events instead.
     """
     return {"status": "ok"}
 
