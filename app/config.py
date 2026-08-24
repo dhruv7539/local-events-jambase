@@ -22,8 +22,11 @@ class Settings(BaseSettings):
     # the two-call resolve flow from doubling our upstream spend on a trial key.
     city_cache_ttl: int = 86_400  # 24 hours
 
-    # One page only. See README/WRITEUP for why this is a documented limit.
-    results_per_page: int = 60
+    # One page only, at the maximum the JamBase OpenAPI spec documents for this
+    # parameter (`perPage`: minimum 1, maximum 100, default 40). Taking the
+    # documented ceiling reduces truncation; it does not eliminate it, which is
+    # why SearchResult reports total_available. See WRITEUP.md.
+    results_per_page: int = 100
 
 
 def get_settings() -> Settings:
