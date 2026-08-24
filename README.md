@@ -26,7 +26,8 @@ cp .env.example .env
 | `JAMBASE_API_KEY` | **yes** | — | Sent as `Authorization: Bearer <key>` |
 | `JAMBASE_BASE_URL` | no | `https://api.data.jambase.com/v3` | Override for testing |
 | `CONNECT_TIMEOUT` | no | `5.0` | Seconds to establish a connection |
-| `READ_TIMEOUT` | no | `10.0` | Seconds to wait for a response body |
+| `READ_TIMEOUT` | no | `10.0` | Seconds to wait for a response body (one request) |
+| `SEARCH_DEADLINE` | no | `12.0` | Seconds for the whole search, including retries |
 | `EVENT_CACHE_TTL` | no | `300` | Event result cache, seconds |
 | `CITY_CACHE_TTL` | no | `86400` | City-name→ID cache, seconds |
 | `RESULTS_PER_PAGE` | no | `100` | Events requested upstream (single page; JamBase's documented max) |
@@ -110,7 +111,7 @@ offers disagree on currency — it is never `0` and never a guess.
 | `422` | `days` outside 1–90, or `location` empty |
 | `500` | Our API credentials were rejected |
 | `502` | Upstream returned an error or was unreachable |
-| `504` | Upstream exceeded the read timeout |
+| `504` | A single request timed out, or the whole search exceeded `SEARCH_DEADLINE` |
 
 ### `GET /health`
 
@@ -137,7 +138,7 @@ any external client would.
 pytest
 ```
 
-72 tests, no network and no API key required.
+79 tests, no network and no API key required.
 
 - `tests/test_normalize.py` — the adapter: normalisation, city resolution,
   retry policy, failure translation and cache TTL behaviour. The transport is

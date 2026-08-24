@@ -13,8 +13,15 @@ class Settings(BaseSettings):
 
     # Explicit per-phase timeouts. A single blanket timeout would let a slow
     # upstream hold a connection far longer than the read budget suggests.
+    # These bound one HTTP request each.
     connect_timeout: float = 5.0
     read_timeout: float = 10.0
+
+    # Bounds the whole search — city resolution, the event fetch, and any
+    # retries between them. Sits deliberately above read_timeout so a single
+    # slow request still fails on its own timeout rather than this one, but
+    # well below the ~20s that two retryable calls could otherwise reach.
+    search_deadline: float = 12.0
 
     # Event results move (statuses change, offers appear), so they expire fast.
     event_cache_ttl: int = 300  # 5 minutes

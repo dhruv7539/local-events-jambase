@@ -228,3 +228,20 @@ def test_routes_never_import_the_concrete_provider():
 
     assert not any("jambase" in name.lower() for name in imported), imported
     assert "EventProvider" in imported, "routes should depend on the Protocol"
+
+
+def test_timeout_returns_the_sanitized_504_unchanged():
+    """The global search deadline reaches the route as ProviderTimeout, so the
+    HTTP contract is identical whether a single request timed out or the whole
+    search exceeded its deadline."""
+    response = client_for(FakeEventProvider(error=ProviderTimeout())).get(
+        "/events?location=Austin&days=7"
+    )
+    assert response.status_code == 504
+    assert response.json() == {
+        "detail": "The event data provider did not respond in time."
+    }
+
+    blob = response.text.lower()
+    for leak in ("jambase", "bearer", "asyncio", "timeout(", "traceback", "deadline"):
+        assert leak not in blob

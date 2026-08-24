@@ -103,6 +103,36 @@ is a test asserting exactly that. Verified live: with the upstream blackholed,
 `/events` returns a clean 504 and no stack trace, while `/health` still returns
 200.
 
+**Two timeout layers, and the second exists because the first stopped being
+enough.** The `httpx.Timeout` bounds one individual upstream request: 5s to
+connect, 10s to read. That was the whole story until the retry landed, and then
+it was not. A cold search makes two upstream calls — city resolution, then the
+event fetch — and once each became retryable, four requests could occur in one
+user-facing search. Per-request limits still held individually, but nothing
+bounded the total: four connect timeouts at 5s each put worst-case latency
+around 20 seconds, on a request a person is waiting on.
+
+So `fetch_events` now runs the whole workflow inside a single
+`asyncio.timeout(12s)` — city resolution, the event fetch, and the retry delays
+between them. It is set above the 10s single-request read timeout deliberately,
+so that layer still does its job rather than becoming unreachable configuration,
+and well below the ~20s the retry made reachable. Expiry raises `TimeoutError`,
+which the provider translates into the existing `ProviderTimeout`, so the API
+returns the same clean 504 whether one request timed out or the whole search
+overran. `httpx.TimeoutException` is not a `TimeoutError` subclass, so the two
+layers cannot be confused for one another.
+
+Stated plainly, because it would be easy to present this as a designed-in pair:
+this is a fix for a defect the retry introduced, not a layered timeout strategy
+planned from the start. I added a retry, that retry multiplied the number of
+upstream calls per search, and only then did per-call timeouts stop giving a
+tight enough bound on what a user actually waits.
+
+What it does **not** guarantee: the deadline bounds time spent inside
+`fetch_events`, not total server response time, and it does not cancel work
+already committed upstream — it stops us waiting, it does not stop JamBase
+processing.
+
 **Cache, retry and rate limiting are three different things, and only two are
 implemented.** The **cache** avoids unnecessary upstream requests. The **retry**
 handles transient failures: exactly one extra attempt on 429/502/503/504 and on
@@ -112,7 +142,11 @@ JamBase returns no `X-RateLimit-*` headers on any response I inspected, so there
 is no documented budget to throttle against and I did not invent one; given a
 documented budget I would add a token bucket in front of the provider.
 
-The retry is bounded at one attempt on purpose. This is interactive
+Together the layers divide the work: the httpx timeout bounds an individual
+upstream request, the one retry improves recovery from a transient failure, and
+the global deadline bounds the aggregate user-visible latency that the
+multi-call retryable workflow made possible. The retry is bounded at one attempt
+on purpose. This is interactive
 request/response traffic, so every additional attempt spends the user's latency
 and our provider quota to buy a shrinking increment of recovery probability.
 Two deliberate exclusions: deterministic 4xx responses (400/401/403/404) are
@@ -296,7 +330,16 @@ rather than an engineering one.
 
 Second place, and closer than I'd like: the in-memory cache means the quota
 protection this app relies on disappears the moment it runs more than one
-worker.
+worker. It also hands the same `SearchResult` instance to every caller, so a
+caller that mutated one would poison later cache hits — not reachable today,
+since routes only serialise, but a latent trap I chose not to fix in the time
+available.
+
+A third, now closed, is worth recording because of how it arose: adding the
+retry silently doubled worst-case search latency, and I only noticed while
+auditing my own change. The global deadline closes it. Reliability work that
+introduces a latency defect is the normal failure mode here, not an unusual
+one.
 
 ## Evolving to 10 providers
 

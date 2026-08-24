@@ -142,6 +142,28 @@ class JamBaseProvider:
     # ---------------------------------------------------------------- public
 
     async def fetch_events(self, location: str, days: int) -> SearchResult:
+        """Run one search under a single overall deadline.
+
+        The per-request httpx timeouts bound each individual upstream call, but
+        a cold search makes two of them and each is retryable, so those limits
+        alone left total latency unbounded in the worst case. This deadline
+        covers the entire workflow — city resolution, the event fetch, and any
+        retry delays between them — and surfaces as the same ProviderTimeout,
+        so callers see the existing clean 504 either way.
+        """
+        try:
+            async with asyncio.timeout(self._settings.search_deadline):
+                return await self._search(location, days)
+        except TimeoutError as exc:
+            # Raised only by the deadline above: httpx.TimeoutException is not a
+            # TimeoutError subclass, so a per-request timeout cannot land here.
+            logger.warning(
+                "search for %r exceeded the %.1fs deadline",
+                location, self._settings.search_deadline,
+            )
+            raise ProviderTimeout() from exc
+
+    async def _search(self, location: str, days: int) -> SearchResult:
         city = await self._resolve_city(location)
 
         cache_key = f"{city['id']}:{days}"

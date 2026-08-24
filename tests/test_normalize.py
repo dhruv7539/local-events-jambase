@@ -11,8 +11,11 @@ No network access. The transport is stubbed with httpx.MockTransport.
 
 from __future__ import annotations
 
+import asyncio
 import json
-from datetime import date, time
+import time
+from datetime import date
+from datetime import time as time_of_day
 from decimal import Decimal
 from pathlib import Path
 
@@ -130,7 +133,7 @@ async def test_date_only_event_has_no_invented_time(events):
 @pytest.mark.asyncio
 async def test_datetime_event_keeps_its_showtime(events):
     result = (await events.fetch_events("Austin", 7)).events
-    assert by_name(result, "Bob Schneider").event_time == time(20, 30)
+    assert by_name(result, "Bob Schneider").event_time == time_of_day(20, 30)
 
 
 @pytest.mark.asyncio
@@ -583,3 +586,97 @@ async def test_cache_key_is_case_insensitive_for_location(clock):
     await provider.fetch_events("Austin, TX", 7)
     await provider.fetch_events("austin, tx", 7)
     assert counts(calls)[0] == 1, "location casing should not split the city cache"
+
+
+# ----------------------------------------------------------- global deadline
+
+
+class SlowTransport(httpx.AsyncBaseTransport):
+    """Upstream that never answers in time.
+
+    The pending sleep is cancelled by the deadline, so tests using this finish
+    in milliseconds despite naming a long delay — there is no real wait.
+    """
+
+    def __init__(self, delay: float = 30.0) -> None:
+        self.delay = delay
+        self.attempts = 0
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        self.attempts += 1
+        await asyncio.sleep(self.delay)
+        return httpx.Response(200, json=CITIES)
+
+
+def provider_with_deadline(transport: httpx.AsyncBaseTransport, deadline: float):
+    client = httpx.AsyncClient(transport=transport)
+    return JamBaseProvider(client, make_settings(search_deadline=deadline))
+
+
+@pytest.mark.asyncio
+async def test_overall_deadline_surfaces_as_provider_timeout():
+    provider = provider_with_deadline(SlowTransport(), deadline=0.01)
+    with pytest.raises(ProviderTimeout):
+        await provider.fetch_events("Austin, TX", 7)
+
+
+@pytest.mark.asyncio
+async def test_deadline_actually_bounds_elapsed_time():
+    """Proves the cap is enforced, not merely configured."""
+    transport = SlowTransport(delay=30.0)
+    provider = provider_with_deadline(transport, deadline=0.05)
+
+    started = time.monotonic()
+    with pytest.raises(ProviderTimeout):
+        await provider.fetch_events("Austin, TX", 7)
+    elapsed = time.monotonic() - started
+
+    assert elapsed < 1.0, f"deadline did not bound the search (took {elapsed:.2f}s)"
+
+
+@pytest.mark.asyncio
+async def test_deadline_covers_the_whole_workflow_not_one_call():
+    """The city call succeeds; the deadline still fires during the event call,
+    which is the case per-request timeouts could not bound."""
+
+    class TwoStageTransport(httpx.AsyncBaseTransport):
+        def __init__(self) -> None:
+            self.paths: list[str] = []
+
+        async def handle_async_request(self, request):
+            self.paths.append(request.url.path)
+            if "geographies" in request.url.path:
+                return httpx.Response(200, json=CITIES)
+            await asyncio.sleep(30.0)
+            return httpx.Response(200, json=FIXTURE)
+
+    transport = TwoStageTransport()
+    provider = provider_with_deadline(transport, deadline=0.05)
+    with pytest.raises(ProviderTimeout):
+        await provider.fetch_events("Austin, TX", 7)
+
+    assert any("geographies" in p for p in transport.paths)
+    assert any(p.endswith("/events") for p in transport.paths)
+
+
+@pytest.mark.asyncio
+async def test_a_fast_search_is_unaffected_by_the_deadline():
+    provider = provider_with_deadline(httpx.MockTransport(happy_handler), deadline=12.0)
+    result = await provider.fetch_events("Austin, TX", 7)
+    assert result.returned_count == len(RAW_EVENTS)
+
+
+@pytest.mark.asyncio
+async def test_per_request_timeout_still_maps_to_provider_timeout(no_delay):
+    """The two layers are distinct: this one fires inside a single request and
+    must not be mistaken for the overall deadline."""
+    handler, attempts = counting_handler([httpx.ReadTimeout("slow")])
+    with pytest.raises(ProviderTimeout):
+        await make_provider(handler).fetch_events("Austin", 7)
+    assert attempts, "the request was actually attempted"
+
+
+def test_deadline_sits_above_the_single_request_read_timeout():
+    """Otherwise read_timeout would be unreachable dead configuration."""
+    settings = make_settings()
+    assert settings.search_deadline > settings.read_timeout
