@@ -388,12 +388,32 @@ async def test_transient_status_is_retried_once_then_succeeds(status, no_delay):
 
 
 @pytest.mark.asyncio
-async def test_connect_error_is_retried_once_then_succeeds(no_delay):
+@pytest.mark.parametrize(
+    "transport_error",
+    [
+        pytest.param(httpx.ConnectError("refused"), id="ConnectError"),
+        pytest.param(httpx.ConnectTimeout("connect timed out"), id="ConnectTimeout"),
+    ],
+)
+async def test_connection_level_error_is_retried_once_then_succeeds(
+    transport_error, no_delay
+):
+    """Both connection-level failures are retried once and then succeed.
+
+    ConnectTimeout is covered explicitly rather than left to inheritance
+    reasoning: it is a TimeoutException, so it would be easy to assume it
+    follows the same no-retry path as ReadTimeout. It does not — it is named
+    in the retryable tuple, and the retry clause is ordered ahead of the
+    TimeoutException clause that would otherwise catch it.
+    """
     handler, attempts = counting_handler(
-        [httpx.ConnectError("refused"), httpx.Response(200, json=CITIES)]
+        [transport_error, httpx.Response(200, json=CITIES)]
     )
-    await make_provider(handler)._resolve_city("Austin")
-    assert len(attempts) == 2
+    city = await make_provider(handler)._resolve_city("Austin")
+
+    assert len(attempts) == 2, "expected exactly one retry"
+    # The second attempt genuinely succeeded rather than failing differently.
+    assert city["id"] == "jambase:4218489"
 
 
 @pytest.mark.asyncio

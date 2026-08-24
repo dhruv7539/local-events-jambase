@@ -142,6 +142,29 @@ JamBase returns no `X-RateLimit-*` headers on any response I inspected, so there
 is no documented budget to throttle against and I did not invent one; given a
 documented budget I would add a token bucket in front of the provider.
 
+Two details of the retry policy are deliberate and easy to get wrong.
+
+**The retry clause catches a tuple of six concrete exception classes, not a
+superclass.** That verbosity is the point. `ReadError` is retried and
+`ReadTimeout` is not, despite the names — in httpx's hierarchy they are
+siblings, not parent and child (`ReadError` descends from `NetworkError`,
+`ReadTimeout` from `TimeoutException`). Catching `TransportError` or
+`TimeoutException` for brevity would have silently swept `ReadTimeout` into the
+retry path and doubled the wait on exactly the requests that are already slow.
+The tuple is checked against the live classes in the tests rather than trusted
+from the names, and `ConnectTimeout` — which *is* a `TimeoutException` and so
+looks like it should follow `ReadTimeout` — is covered by its own parameterised
+case.
+
+**HTTP 500 is deliberately not retried, and this one is a judgment call rather
+than a rule.** 502, 503 and 504 say the request never landed or the upstream was
+overloaded, so a second attempt has something to gain. A 500 means the request
+*did* land and processing failed, so a retry may just reproduce the same
+failure at the cost of latency and quota. Reasonable people put 500 in the
+retryable set; I left it out because the recovery odds are worse and the failure
+mode is a doubled wait on a request that was never going to succeed. If upstream
+telemetry showed transient 500s, this is the first thing I would revisit.
+
 Together the layers divide the work: the httpx timeout bounds an individual
 upstream request, the one retry improves recovery from a transient failure, and
 the global deadline bounds the aggregate user-visible latency that the
