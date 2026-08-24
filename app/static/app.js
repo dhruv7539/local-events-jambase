@@ -73,7 +73,7 @@ function card(event) {
   title.append(event.url ? link(event.url, event.name) : text(event.name));
   li.append(title);
 
-  li.append(el("div", "where", formatVenue(event.venue)));
+  li.append(el("div", "where", formatVenue(event)));
 
   // A moved show is the single most decision-relevant fact on the card, so the
   // original date is spelled out rather than implied by a badge alone.
@@ -83,9 +83,16 @@ function card(event) {
 
   const meta = el("div", "meta");
   if (needsAttention) meta.append(el("span", "badge", event.status));
-  if (event.headliner) meta.append(el("span", "tag", event.headliner));
+  // JamBase names events "{artist} at {venue}", so the headliner is usually
+  // already in the title. Repeating it as a pill is noise, and a pill that
+  // looks identical to a genre pill actively misleads. Show it only when the
+  // title doesn't already say it.
+  if (event.headliner && !titleMentions(event.name, event.headliner)) {
+    meta.append(el("span", "tag artist", event.headliner));
+  }
   event.genres.slice(0, 3).forEach((g) => meta.append(el("span", "tag", g)));
-  meta.append(priceEl(event.price_range));
+  // A price for a show that isn't happening is noise at best.
+  if (event.status !== "cancelled") meta.append(priceEl(event.price_range));
   if (event.ticket_url && event.status !== "cancelled") {
     const a = link(event.ticket_url, "Tickets →");
     a.className = "tickets";
@@ -93,6 +100,15 @@ function card(event) {
   }
   li.append(meta);
   return li;
+}
+
+// JamBase is inconsistent about dashes and casing between an event's title and
+// its performer name ("... - A Tribute to ..." vs "... - A Tribute To ..."),
+// so a plain substring test misses real duplicates. Compare on letters and
+// digits only.
+function titleMentions(title, name) {
+  const flatten = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return flatten(title).includes(flatten(name));
 }
 
 function priceEl(range) {
@@ -140,9 +156,14 @@ function formatDate(iso) {
   });
 }
 
-function formatVenue(venue) {
+function formatVenue(event) {
+  const venue = event.venue;
   const place = [venue.city, venue.region].filter(Boolean).join(", ");
-  return place ? `${venue.name} · ${place}` : venue.name;
+  // The event title already ends with the venue name in JamBase's data, so
+  // repeating it wastes the most scannable line on the card. Show the venue
+  // name only when the title doesn't already carry it.
+  const name = event.name.includes(venue.name) ? "" : venue.name;
+  return [name, place].filter(Boolean).join(" · ") || venue.name;
 }
 
 // --- tiny DOM helpers; textContent everywhere, so provider strings are never

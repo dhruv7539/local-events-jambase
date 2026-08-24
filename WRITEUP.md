@@ -150,10 +150,19 @@ provider-supplied strings are inserted with `textContent`, never `innerHTML`.
   city selection, failure translation and caching. There are no tests that go
   through FastAPI's router, so route wiring and the exception handler are
   verified by hand (I ran them) rather than by CI.
-- **The UI was never visually verified.** The browser tooling in my environment
-  wasn't connected. The page and both static assets serve with correct content
-  types and the JS passes `node --check`, but nobody has watched it render.
-  [VERIFY] — decide whether you want to open it and confirm before submitting.
+- **The UI was verified late, and looking at it found three defects.** I built
+  the whole UI from `curl` output before ever seeing it render. When I finally
+  screenshotted it (headless Chrome, light and dark), three problems were
+  immediately visible that no amount of JSON inspection would have caught:
+  JamBase names events `"{artist} at {venue}"`, so every card printed the artist
+  twice and the venue twice; the artist pill was styled identically to genre
+  pills, so the two were indistinguishable; and cancelled shows still displayed
+  a price range. A fourth appeared after the first fix — a tribute act rendered
+  as a full-width pill because the title used a hyphen where the performer name
+  used an en-dash, so my substring de-duplication missed it, and a
+  `text-transform: capitalize` intended for lowercase genre slugs was mangling
+  proper nouns. All four are fixed. The lesson is the process one: I should have
+  looked at the page hours earlier.
 
 ## What I'd change or add with more time
 
@@ -232,9 +241,24 @@ omitted. Worse, the truncation is silent and date-ordered, so the missing events
 are systematically the later ones — a user searching 30 days out may see nothing
 past week two and reasonably conclude the city is empty then.
 
-It is not hard to fix; it is a loop over `pagination.nextPage` with a page cap.
-It was cut for time, and the honest statement is that the app currently answers a
-narrower question than the one the UI appears to ask.
+This is not theoretical. Rendering a 30-day Austin search produced exactly 60
+cards, and neither the rescheduled show on 1 September nor the festival on
+5 September was among them — both exist in the data and both were silently
+dropped. The app's headline feature is surfacing status changes, and the
+truncation demonstrably hides them.
+
+Fetching more pages is a loop over `pagination.nextPage`, but it is not free: on
+a trial key, following five pages multiplies quota use per search by five. The
+cheaper honest fix — telling the user "showing 60 of 268" — is blocked by
+something more interesting. `fetch_events(location, days) -> list[Event]` has no
+envelope, so there is nowhere for result *metadata* to live: not the total
+available, not which page we stopped at. Surfacing the ceiling honestly requires
+returning a `SearchResult` wrapper rather than a bare list.
+
+That is worth noticing because it is the same change the ten-provider design
+needs for partial failure, below. A bare `list[Event]` says "here is the
+complete answer" and cannot say "here is part of the answer, and here is what is
+missing" — which is the thing a real aggregator most needs to say.
 
 Second place, and closer than I'd like: the in-memory cache means the quota
 protection this app relies on disappears the moment it runs more than one worker.
@@ -252,7 +276,8 @@ things that would *actually* break at ten:
 would not know the difference. Total latency becomes the slowest provider, so it
 needs a per-provider timeout budget shorter than the overall one.
 
-**2. Partial failure becomes the normal case.** With ten upstreams, one being
+**2. Partial failure becomes the normal case** — and it needs the same
+`SearchResult` envelope the results ceiling already asked for. With ten upstreams, one being
 down is routine, and the current all-or-nothing error model is wrong: today any
 `ProviderError` fails the request. The response would need to carry which sources
 answered, and the composite would return partial results with a `degraded` flag
@@ -285,9 +310,9 @@ and where the "no database" call would be revisited.
 | Area | Grade | Reasoning |
 |---|---|---|
 | **Code quality** | **B+** | Clean layering, honest naming, meaningful docstrings, and 24 tests against real captured data — but no linter or type-checker is configured or run, and the HTTP layer has no automated coverage at all. |
-| **Work product** | **B** | Every requirement is met and verified live, including the failure paths, but it silently shows 60 of 268 events and I never saw the UI render in a browser. |
+| **Work product** | **B** | Every requirement is verified live, including all failure paths, and screenshotting the UI caught four real rendering defects that are now fixed — but I built it blind for far too long, and the 60-event ceiling demonstrably hides the rescheduled and cancelled shows the app exists to surface. |
 | **Extensibility** | **B+** | The Protocol boundary is real and proven by test doubles rather than asserted — but it has exactly one implementation, so the abstraction is untested against a second API's shape, which is the only test that counts. |
 
-Not straight A's, and it shouldn't be: this is a two-hour build with a known
-results ceiling, an unverified UI, and an abstraction that hasn't yet met its
-second case.
+Not straight A's, and it shouldn't be: this is a two-hour build with a results
+ceiling that hides the app's own headline signal, a UI I didn't look at until
+after it was written, and an abstraction that hasn't yet met its second case.
