@@ -1,6 +1,9 @@
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-httpx==0.28.1
-pydantic==2.10.4
-pydantic-settings==2.7.0
-pytest==8.3.4
+# Lower bounds rather than exact pins: the app uses stable APIs from each of
+# these, and exact pins broke the build on Python 3.14 where the pinned
+# pydantic had no wheel. A production service would pin exactly via a lockfile.
+fastapi>=0.115
+uvicorn[standard]>=0.34
+httpx>=0.28
+pydantic>=2.10
+pydantic-settings>=2.7
+pytest>=8.3

@@ -11,7 +11,7 @@ from datetime import date, time
 from decimal import Decimal
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class EventStatus(str, Enum):
@@ -89,14 +89,22 @@ class Event(BaseModel):
     price_range: PriceRange | None = None
 
     @property
-    def headliner(self) -> Performer | None:
+    def _headliner(self) -> Performer | None:
         for performer in self.performers:
             if performer.is_headliner:
                 return performer
         return self.performers[0] if self.performers else None
 
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def headliner(self) -> str | None:
+        """Name of the billed headliner, falling back to the first performer."""
+        performer = self._headliner
+        return performer.name if performer else None
+
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def genres(self) -> list[str]:
-        """Genres of the headliner, de-duplicated, order preserved."""
-        headliner = self.headliner
-        return list(dict.fromkeys(headliner.genres)) if headliner else []
+        """Headliner's genres, de-duplicated, order preserved."""
+        performer = self._headliner
+        return list(dict.fromkeys(performer.genres)) if performer else []
