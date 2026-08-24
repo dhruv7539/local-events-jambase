@@ -161,8 +161,14 @@ provider-supplied strings are inserted with `textContent`, never `innerHTML`.
   as a full-width pill because the title used a hyphen where the performer name
   used an en-dash, so my substring de-duplication missed it, and a
   `text-transform: capitalize` intended for lowercase genre slugs was mangling
-  proper nouns. All four are fixed. The lesson is the process one: I should have
-  looked at the page hours earlier.
+  proper nouns. A fifth surfaced only once I opened it in a *real* browser
+  rather than headless: this machine reports `navigator.language` as `en-US` but
+  resolves its format locale to `en-GB`, so passing `undefined` to `Intl`
+  followed the OS region and rendered every showtime as "19:00" and every price
+  as "US$15". I had written that off as a headless artifact that would resolve
+  on a normal machine; it was not. All five are fixed. The lesson is the process
+  one: I should have looked at the page hours earlier, and "it'll be fine in a
+  real browser" was an assumption I should have tested rather than asserted.
 
 ## What I'd change or add with more time
 
